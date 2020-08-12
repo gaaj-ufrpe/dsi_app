@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -76,8 +77,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-      ),
+          title: Row(
+        children: <Widget>[
+          Text(widget.title),
+          Spacer(),
+          Image(image: AssetImage('images/logo/bsi-white.png'), height: 32),
+        ],
+      )),
       body: Center(child: MyMessageWidget(_getText(), _getImageName())),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
