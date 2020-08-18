@@ -47,7 +47,8 @@ class LoginFormState extends State<LoginForm> {
       context: context,
       title: 'Warning',
       message: '''Falta implementar esta função.\n'''
-          '''Agora é com vocês!''',
+          '''Agora é com você:\n'''
+          '''Implemente uma tela para esta funcionalidade!''',
     );
   }
 
