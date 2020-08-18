@@ -3,20 +3,22 @@ import 'package:dsi_app/infra.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class RegisterPage extends AbstractDsiPage {
+class RegisterPage extends StatelessWidget {
   @override
-  Widget buildBody(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Spacer(),
-        Image(
-          image: Images.bsiLogo,
-          height: 100,
-        ),
-        Constants.spaceSmallHeight,
-        RegisterForm(),
-        Spacer(),
-      ],
+  Widget build(BuildContext context) {
+    return DsiScaffold(
+      body: Column(
+        children: <Widget>[
+          Spacer(),
+          Image(
+            image: Images.bsiLogo,
+            height: 100,
+          ),
+          Constants.spaceSmallHeight,
+          RegisterForm(),
+          Spacer(),
+        ],
+      ),
     );
   }
 }
@@ -34,25 +36,18 @@ class RegisterFormState extends State<RegisterForm> {
   void _register() {
     if (!_formKey.currentState.validate()) return;
 
-    var alert = AlertDialog(
-      title: Text('Sucesso'),
-      content: Text('Seu cadastro foi efetuado com sucesso.'),
-      actions: <Widget>[
-        FlatButton(
-          child: Text('Fechar'),
-          onPressed: () {
-            Navigator.of(context)..pop()..pop();
-            //A linha acima é equivalente a executar as duas linhas abaixo:
-            //Navigator.of(context).pop();
-            //Navigator.of(context).pop();
-            //
-            //Para maiores informações, leia sobre 'cascade notation' no Dart.
-            //https://dart.dev/guides/language/language-tour#cascade-notation-
-          },
-        ),
-      ],
+    DsiDialog.showInfo(
+      context: context,
+      message: 'Seu cadastro foi realizado com sucesso.',
+      buttonPressed: () => Navigator.of(context)..pop()..pop(),
     );
-    showDialog(context: context, child: alert);
+
+    //A linha acima é equivalente a executar as duas linhas abaixo:
+    //Navigator.of(context).pop();
+    //Navigator.of(context).pop();
+    //
+    //Para maiores informações, leia sobre 'cascade notation' no Dart.
+    //https://dart.dev/guides/language/language-tour
   }
 
   void _cancel() {

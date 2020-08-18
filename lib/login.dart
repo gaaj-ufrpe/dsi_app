@@ -4,28 +4,30 @@ import 'package:dsi_app/register.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class LoginPage extends AbstractDsiPage {
+class LoginPage extends StatelessWidget {
   @override
-  Widget buildBody(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Spacer(),
-        Image(
-          image: Images.bsiLogo,
-          height: 100,
-        ),
-        Constants.spaceSmallHeight,
-        LoginForm(),
-        Spacer(),
-        Padding(
-          padding: Constants.paddingMedium,
-          child: Text(
-            'App desenvolvido por Gabriel Alves para a disciplina de'
-            ' Desenvolvimento de Sistemas de Informação do BSI/UFRPE.',
-            style: Theme.of(context).textTheme.caption.copyWith(fontSize: 12),
+  Widget build(BuildContext context) {
+    return DsiScaffold(
+      body: Column(
+        children: <Widget>[
+          Spacer(),
+          Image(
+            image: Images.bsiLogo,
+            height: 100,
           ),
-        )
-      ],
+          Constants.spaceSmallHeight,
+          LoginForm(),
+          Spacer(),
+          Padding(
+            padding: Constants.paddingMedium,
+            child: Text(
+              'App desenvolvido por Gabriel Alves para a disciplina de'
+              ' Desenvolvimento de Sistemas de Informação do BSI/UFRPE.',
+              style: Theme.of(context).textTheme.caption.copyWith(fontSize: 12),
+            ),
+          )
+        ],
+      ),
     );
   }
 }
@@ -41,25 +43,19 @@ class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
 
   void _forgotPassword() {
-    print('Forgot password pressed.');
+    DsiDialog.showInfo(
+      context: context,
+      title: 'Warning',
+      message: '''Falta implementar esta função.\n'''
+          '''Agora é com vocês!''',
+    );
   }
 
   void _login() {
     if (!_formKey.currentState.validate()) return;
 
-    var alert = AlertDialog(
-      title: Text('Sucesso'),
-      content: Text('Seu login foi efetuado com sucesso.'),
-      actions: <Widget>[
-        FlatButton(
-          child: Text('Fechar'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
-    );
-    showDialog(context: context, child: alert);
+    DsiDialog.showInfo(
+        context: context, message: 'Seu login foi efetuado com sucesso.');
   }
 
   void _register() {
