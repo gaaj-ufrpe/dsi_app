@@ -85,28 +85,33 @@ class _DSIPageState extends State<DSIPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Row(
-        children: <Widget>[
-          Text(widget.title),
-          Spacer(),
-          Image(image: AssetImage('images/logo/bsi-white.png'), height: 32),
-        ],
-      )),
+        title: Row(
+          children: <Widget>[
+            Text(widget.title),
+            Spacer(),
+            Image(image: AssetImage('images/logo/bsi-white.png'), height: 32),
+          ],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
-            child: Column(children: <Widget>[
-          DSIMainBodyWidget(
-              _getCountText(), _getWarningText(), _getImageName()),
-          Spacer(),
-          FlatButton(
-              onPressed: _resetCounter,
-              color: Colors.green,
-              child: Text(
-                'Reset',
-                style: TextStyle(color: Colors.white, fontSize: 16.0),
-              ))
-        ])),
+          child: Column(
+            children: <Widget>[
+              DSIMainBodyWidget(
+                  _getCountText(), _getWarningText(), _getImageName()),
+              Spacer(),
+              FlatButton(
+                onPressed: _resetCounter,
+                color: Colors.green,
+                child: Text(
+                  'Reset',
+                  style: TextStyle(color: Colors.white, fontSize: 16.0),
+                ),
+              )
+            ],
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
