@@ -1,12 +1,37 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-Size getSize(BuildContext context) {
-  return MediaQuery.of(context).size;
+final dsiHelper = _DsiHelper();
+
+class _DsiHelper {
+  Size getBodySize(BuildContext context) {
+    return MediaQuery.of(context).size;
+  }
+
+  double getBodyHeight(BuildContext context) {
+    return getBodySize(context).height;
+  }
+
+  double getBodyWidth(BuildContext context) {
+    return getBodySize(context).width;
+  }
+
+  void go(context, page) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => page),
+    );
+  }
+
+  void back(context) {
+    Navigator.pop(context);
+  }
 }
 
-class DsiDialog {
-  static void showInfo(
+final dsiDialog = _DsiDialog();
+
+class _DsiDialog {
+  void showInfo(
       {@required context,
       title = 'Sucesso',
       message = 'Operação realizada com sucesso.',
@@ -37,24 +62,28 @@ class DsiDialog {
 /// aparelho. Esta primeira implementação considera apenas o Scaffold com o
 /// parâmetro 'body'
 class DsiScaffold extends StatelessWidget {
+  final Widget appBar;
   final Widget body;
+  final Widget floatingActionButton;
 
   //Na definição do parâmetro {@required this.body}, as chaves indicam que o
   //parâmetro é nominal (named parameter) e a anotação @required indica que o
   //parâmetro é obrigatório.
-  DsiScaffold({@required this.body});
+  DsiScaffold({@required this.body, this.appBar, this.floatingActionButton});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: this.appBar,
       body: Center(
         child: SingleChildScrollView(
           child: Container(
-            height: getSize(context).height,
+            height: dsiHelper.getBodyHeight(context),
             child: this.body,
           ),
         ),
       ),
+      floatingActionButton: this.floatingActionButton,
     );
   }
 }

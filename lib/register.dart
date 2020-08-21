@@ -36,10 +36,10 @@ class RegisterFormState extends State<RegisterForm> {
   void _register() {
     if (!_formKey.currentState.validate()) return;
 
-    DsiDialog.showInfo(
+    dsiDialog.showInfo(
       context: context,
       message: 'Seu cadastro foi realizado com sucesso.',
-      buttonPressed: () => Navigator.of(context)..pop()..pop(),
+      buttonPressed: () => dsiHelper..back(context)..back(context),
     );
 
     //A linha acima é equivalente a executar as duas linhas abaixo:
@@ -51,7 +51,7 @@ class RegisterFormState extends State<RegisterForm> {
   }
 
   void _cancel() {
-    Navigator.of(context).pop();
+    dsiHelper.back(context);
   }
 
   @override
