@@ -1,9 +1,9 @@
 import 'package:dsi_app/constants.dart';
-import 'package:dsi_app/home.dart';
 import 'package:dsi_app/infra.dart';
-import 'package:dsi_app/register.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'dsi_widgets.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -56,11 +56,11 @@ class LoginFormState extends State<LoginForm> {
   void _login() {
     if (!_formKey.currentState.validate()) return;
 
-    dsiHelper.go(context, HomePage());
+    dsiHelper.go(context, '/home');
   }
 
   void _register() {
-    dsiHelper.go(context, RegisterPage());
+    dsiHelper.go(context, '/register');
   }
 
   @override

@@ -1,4 +1,5 @@
 import 'package:dsi_app/constants.dart';
+import 'package:dsi_app/dsi_widgets.dart';
 import 'package:dsi_app/infra.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

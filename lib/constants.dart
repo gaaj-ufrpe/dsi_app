@@ -8,6 +8,9 @@ class Constants {
   static const paddingMedium = EdgeInsets.all(12.0);
   static const spaceSmallHeight = SizedBox(height: 8.0);
   static const spaceMediumHeight = SizedBox(height: 16.0);
+  static const Color colorGreenBSI1 = Color(0xff89992e);
+  static const Color colorGreenBSI2 = Color(0xffc2ca94);
+  static const Color colorGreenBSI3 = Color(0xfff7ffe8);
 }
 
 class Images {
