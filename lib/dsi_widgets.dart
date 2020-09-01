@@ -42,47 +42,24 @@ class DsiScaffold extends StatelessWidget {
   final String title;
   final Widget body;
   final Widget floatingActionButton;
+  final bool showAppBar;
 
   //Na definição do parâmetro {@required this.body}, as chaves indicam que o
   //parâmetro é nominal (named parameter) e a anotação @required indica que o
   //parâmetro é obrigatório.
-  DsiScaffold({@required this.body, this.title, this.floatingActionButton});
+  DsiScaffold(
+      {@required this.body,
+      this.title,
+      this.floatingActionButton,
+      this.showAppBar = true});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(context),
       drawer: _buildSideMenu(context),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Container(
-            height: dsiHelper.getBodyHeight(context),
-            child: this.body,
-          ),
-        ),
-      ),
+      body: this.body,
       floatingActionButton: this.floatingActionButton,
-    );
-  }
-
-  Drawer _buildSideMenu(context) {
-    var themeData = Theme.of(context);
-    return Drawer(
-      child: ListView(
-        children: <Widget>[
-          _buildSideMenuHeader(context, themeData),
-          ListTile(
-            leading: Icon(Icons.home),
-            title: Text('Home'),
-            onTap: () => dsiHelper.go(context, '/home'),
-          ),
-          ListTile(
-            leading: Icon(Icons.exit_to_app),
-            title: Text('Sair'),
-            onTap: () => dsiHelper.exit(context),
-          ),
-        ],
-      ),
     );
   }
 
@@ -136,11 +113,44 @@ class DsiScaffold extends StatelessWidget {
     );
   }
 
+  Drawer _buildSideMenu(context) {
+    var themeData = Theme.of(context);
+    return Drawer(
+      child: ListView(
+        children: <Widget>[
+          _buildSideMenuHeader(context, themeData),
+          ListTile(
+            leading: Icon(Icons.home),
+            title: Text('Home'),
+            onTap: () => dsiHelper.go(context, '/home'),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.people),
+            title: Text('Alunos'),
+            onTap: () => dsiHelper.go(context, '/list_aluno'),
+          ),
+          ListTile(
+            leading: Icon(Icons.school),
+            title: Text('Professores'),
+            onTap: () => dsiHelper.go(context, '/list_professor'),
+          ),
+          Divider(),
+          ListTile(
+            leading: Icon(Icons.exit_to_app),
+            title: Text('Sair'),
+            onTap: () => dsiHelper.exit(context),
+          ),
+        ],
+      ),
+    );
+  }
+
   AppBar _buildAppBar(context) {
-    if (title == null) return null;
+    if (!showAppBar) return null;
     //quando informa o drawer do scaffold, não se informa o leading do AppBar.
     return AppBar(
-      title: Text(title),
+      title: title != null ? Text(title) : null,
       actions: <Widget>[
         IconButton(
           onPressed: () => print('search'),
@@ -177,6 +187,75 @@ class DsiScaffold extends StatelessWidget {
               value: 'sair',
             ),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+class DsiBasicFormPage extends StatefulWidget {
+  final String title;
+  final onSave;
+  final Widget body;
+  final hideButtons;
+  DsiBasicFormPage(
+      {@required this.title,
+      @required this.body,
+      this.onSave,
+      this.hideButtons = false});
+
+  @override
+  DsiBasicFormPageState createState() => DsiBasicFormPageState();
+}
+
+class DsiBasicFormPageState<T> extends State<DsiBasicFormPage> {
+  final formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return DsiScaffold(
+      title: widget.title,
+      body: SingleChildScrollView(
+        child: Form(
+          key: formKey,
+          child: Padding(
+            padding: Constants.paddingMedium,
+            child: Column(
+              children: <Widget>[
+                Constants.spaceMediumHeight,
+                widget.body,
+                Constants.spaceMediumHeight,
+                _buildFormButtons(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFormButtons() {
+    if (widget.hideButtons) return null;
+
+    return Column(
+      children: <Widget>[
+        SizedBox(
+          width: double.infinity,
+          child: RaisedButton(
+            child: Text('Salvar'),
+            onPressed: () {
+              if (!formKey.currentState.validate()) return;
+              setState(() {
+                formKey.currentState.save();
+              });
+              widget.onSave.call();
+            },
+          ),
+        ),
+        FlatButton(
+          child: Text('Cancelar'),
+          padding: Constants.paddingSmall,
+          onPressed: () => dsiHelper.back(context),
         ),
       ],
     );

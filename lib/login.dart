@@ -9,25 +9,34 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DsiScaffold(
-      body: Column(
-        children: <Widget>[
-          Spacer(),
-          Image(
-            image: Images.bsiLogo,
-            height: 100,
+      showAppBar: false,
+      body: SingleChildScrollView(
+        child: Container(
+          height: dsiHelper.getScreenHeight(context),
+          child: Column(
+            children: <Widget>[
+              Spacer(),
+              Image(
+                image: Images.bsiLogo,
+                height: 100,
+              ),
+              Constants.spaceSmallHeight,
+              LoginForm(),
+              Spacer(),
+              Padding(
+                padding: Constants.paddingMedium,
+                child: Text(
+                  'App desenvolvido por Gabriel Alves para a disciplina de'
+                  ' Desenvolvimento de Sistemas de Informação do BSI/UFRPE.',
+                  style: Theme.of(context)
+                      .textTheme
+                      .caption
+                      .copyWith(fontSize: 12),
+                ),
+              )
+            ],
           ),
-          Constants.spaceSmallHeight,
-          LoginForm(),
-          Spacer(),
-          Padding(
-            padding: Constants.paddingMedium,
-            child: Text(
-              'App desenvolvido por Gabriel Alves para a disciplina de'
-              ' Desenvolvimento de Sistemas de Informação do BSI/UFRPE.',
-              style: Theme.of(context).textTheme.caption.copyWith(fontSize: 12),
-            ),
-          )
-        ],
+        ),
       ),
     );
   }
@@ -35,9 +44,7 @@ class LoginPage extends StatelessWidget {
 
 class LoginForm extends StatefulWidget {
   @override
-  LoginFormState createState() {
-    return LoginFormState();
-  }
+  LoginFormState createState() => LoginFormState();
 }
 
 class LoginFormState extends State<LoginForm> {

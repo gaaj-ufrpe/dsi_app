@@ -8,17 +8,22 @@ class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DsiScaffold(
-      body: Column(
-        children: <Widget>[
-          Spacer(),
-          Image(
-            image: Images.bsiLogo,
-            height: 100,
+      body: SingleChildScrollView(
+        child: Container(
+          height: dsiHelper.getScreenHeight(context),
+          child: Column(
+            children: <Widget>[
+              Spacer(),
+              Image(
+                image: Images.bsiLogo,
+                height: 100,
+              ),
+              Constants.spaceSmallHeight,
+              RegisterForm(),
+              Spacer(),
+            ],
           ),
-          Constants.spaceSmallHeight,
-          RegisterForm(),
-          Spacer(),
-        ],
+        ),
       ),
     );
   }
@@ -26,9 +31,7 @@ class RegisterPage extends StatelessWidget {
 
 class RegisterForm extends StatefulWidget {
   @override
-  RegisterFormState createState() {
-    return RegisterFormState();
-  }
+  RegisterFormState createState() => RegisterFormState();
 }
 
 class RegisterFormState extends State<RegisterForm> {

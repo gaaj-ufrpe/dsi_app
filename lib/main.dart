@@ -1,3 +1,4 @@
+import 'package:dsi_app/aluno.dart';
 import 'package:dsi_app/constants.dart';
 import 'package:dsi_app/home.dart';
 import 'package:dsi_app/login.dart';
@@ -55,6 +56,8 @@ class DSIApp extends StatelessWidget {
       '/': (context) => LoginPage(),
       '/register': (context) => RegisterPage(),
       '/home': (context) => HomePage(),
+      '/list_aluno': (context) => ListAlunoPage(),
+      '/maintain_aluno': (context) => MaintainAlunoPage(),
     };
   }
 }
