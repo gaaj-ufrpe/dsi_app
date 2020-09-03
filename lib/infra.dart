@@ -33,11 +33,41 @@ class _DsiHelper {
     return ModalRoute.of(context).settings.arguments;
   }
 
-  void showMessage(context, message) {
+  void showMessage({
+    context,
+    message = 'Operação realizada com sucesso.',
+  }) {
     Scaffold.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
       ),
+    );
+  }
+
+  void showAlert(
+      {context,
+      message = 'Operação realizada com sucesso.',
+      title = 'Sucesso',
+      onPressed}) {
+    var dialog = AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: <Widget>[
+        FlatButton(
+          child: Text('Fechar'),
+          onPressed: () {
+            if (onPressed == null) {
+              Navigator.of(context).pop();
+            } else {
+              onPressed.call();
+            }
+          },
+        ),
+      ],
+    );
+    showDialog(
+      context: context,
+      builder: (context) => dialog,
     );
   }
 }

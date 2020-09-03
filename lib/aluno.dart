@@ -1,57 +1,36 @@
 import 'package:dsi_app/constants.dart';
 import 'package:dsi_app/dsi_widgets.dart';
 import 'package:dsi_app/infra.dart';
+import 'package:dsi_app/pessoa.dart';
 import 'package:flutter/material.dart';
 
-class Aluno {
-  int id;
-  String nome, matricula;
-  Aluno({this.id, this.nome, this.matricula});
+/// A classe aluno representa um aluno do sistema e é uma subclasse de Pessoa.
+/// Assim, tudo o que Pessoa possui, um aluno também possui.
+/// E todas as operações que podem ser feitas com uma pessoa, também podem ser
+/// feitas com um aluno. Assim, todos os métodos e funções que recebiam uma
+/// Pessoa como parâmetro, também podem receber também um Aluno.
+class Aluno extends Pessoa {
+  String matricula;
+
+  //Observe que o construtor de aluno repassa alguns dos parâmetros recebidos
+  //para o construtor da super classe (Pessoa).
+  Aluno({cpf, nome, endereco, this.matricula})
+      : super(cpf: cpf, nome: nome, endereco: endereco);
 }
 
 var alunoController = AlunoController();
 
 class AlunoController {
-  var _nextId = 1;
-  var _alunos = <Aluno>[];
-  AlunoController() {
-    for (var i = 1; i <= 20; i++) {
-      var id = _nextId++;
-      var aluno = Aluno(
-        id: id,
-        nome: 'Aluno $id',
-        matricula: id.toString().padLeft(10, '0'),
-      );
-      _alunos.add(aluno);
-    }
-  }
-
   List<Aluno> getAll() {
-    return _alunos;
+    return pessoaController.getAll().whereType<Aluno>().toList();
   }
 
   Aluno save(aluno) {
-    //se o aluno não possui id, está inserindo.
-    //caso contrário, está alterando.
-    //na alteração, remove o elemento do índice e substitui pelo novo.
-    if (aluno.id == null) {
-      aluno.id = _nextId++;
-      _alunos.add(aluno);
-    } else {
-      var idx = _alunos.indexWhere((element) => element.id == aluno.id);
-      _alunos.setRange(idx, idx + 1, [aluno]);
-    }
-    return aluno;
+    return pessoaController.save(aluno);
   }
 
   bool remove(aluno) {
-    var result = false;
-    var idx = _alunos.indexWhere((element) => element.id == aluno.id);
-    if (idx != -1) {
-      result = true;
-      _alunos.removeAt(idx);
-    }
-    return result;
+    return pessoaController.remove(aluno);
   }
 }
 
@@ -90,7 +69,10 @@ class ListAlunoPageState extends State<ListAlunoPage> {
           alunoController.remove(aluno);
           _alunos.remove(index);
         });
-        dsiHelper.showMessage(context, '${aluno.nome} foi removido.');
+        dsiHelper.showMessage(
+          context: context,
+          message: '${aluno.nome} foi removido.',
+        );
       },
       background: Container(
         color: Colors.red,
@@ -133,8 +115,20 @@ class MaintainAlunoPage extends StatelessWidget {
         alunoController.save(aluno);
         dsiHelper.go(context, '/list_aluno');
       },
-      body: Column(
+      body: Wrap(
+        alignment: WrapAlignment.center,
+        runSpacing: Constants.spaceSmallHeight.height,
         children: <Widget>[
+          TextFormField(
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(labelText: 'CPF*'),
+            validator: (String value) {
+              return value.isEmpty ? 'CPF inválido.' : null;
+            },
+            initialValue: aluno.cpf,
+            onSaved: (newValue) => aluno.cpf = newValue,
+          ),
+          Constants.spaceSmallHeight,
           TextFormField(
             keyboardType: TextInputType.text,
             decoration: const InputDecoration(labelText: 'Nome*'),
@@ -143,6 +137,16 @@ class MaintainAlunoPage extends StatelessWidget {
             },
             initialValue: aluno.nome,
             onSaved: (newValue) => aluno.nome = newValue,
+          ),
+          Constants.spaceSmallHeight,
+          TextFormField(
+            keyboardType: TextInputType.text,
+            decoration: const InputDecoration(labelText: 'Endereço*'),
+            validator: (String value) {
+              return value.isEmpty ? 'Endereço inválido.' : null;
+            },
+            initialValue: aluno.endereco,
+            onSaved: (newValue) => aluno.endereco = newValue,
           ),
           Constants.spaceSmallHeight,
           TextFormField(

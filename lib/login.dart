@@ -51,7 +51,7 @@ class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
 
   void _forgotPassword() {
-    dsiDialog.showInfo(
+    dsiHelper.showAlert(
       context: context,
       title: 'Warning',
       message: '''Falta implementar esta função.\n'''
@@ -76,7 +76,9 @@ class LoginFormState extends State<LoginForm> {
       key: _formKey,
       child: Padding(
         padding: Constants.paddingMedium,
-        child: Column(
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          runSpacing: Constants.spaceSmallHeight.height,
           children: <Widget>[
             TextFormField(
               keyboardType: TextInputType.text,
@@ -85,7 +87,6 @@ class LoginFormState extends State<LoginForm> {
                 return value.isEmpty ? 'Login inválido.' : null;
               },
             ),
-            Constants.spaceSmallHeight,
             TextFormField(
               keyboardType: TextInputType.visiblePassword,
               obscureText: true,
@@ -98,11 +99,10 @@ class LoginFormState extends State<LoginForm> {
               alignment: Alignment.centerRight,
               child: FlatButton(
                 child: Text('Esqueceu a senha?'),
-                padding: Constants.paddingSmall,
+                padding: Constants.paddingSmall.copyWith(top: 0.0),
                 onPressed: _forgotPassword,
               ),
             ),
-            Constants.spaceMediumHeight,
             SizedBox(
               width: double.infinity,
               child: RaisedButton(

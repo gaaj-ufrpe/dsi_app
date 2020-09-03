@@ -2,10 +2,12 @@ import 'package:dsi_app/aluno.dart';
 import 'package:dsi_app/constants.dart';
 import 'package:dsi_app/home.dart';
 import 'package:dsi_app/login.dart';
+import 'package:dsi_app/pessoa.dart';
 import 'package:dsi_app/register.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  _initDb();
   runApp(DSIApp());
 }
 
@@ -56,8 +58,31 @@ class DSIApp extends StatelessWidget {
       '/': (context) => LoginPage(),
       '/register': (context) => RegisterPage(),
       '/home': (context) => HomePage(),
+      '/list_pessoa': (context) => ListPessoaPage(),
+      '/maintain_pessoa': (context) => MaintainPessoaPage(),
       '/list_aluno': (context) => ListAlunoPage(),
       '/maintain_aluno': (context) => MaintainAlunoPage(),
     };
+  }
+}
+
+void _initDb() {
+  for (var i = 1; i <= 20; i++) {
+    var matricula = i.toString().padLeft(11, '0');
+    var cpf = '${matricula.substring(0, 3)}.'
+        '${matricula.substring(3, 6)}.'
+        '${matricula.substring(6, 9)}-'
+        '${matricula.substring(9)}';
+
+    var aluno = Aluno(
+      cpf: cpf,
+      nome: 'Aluno $i',
+      endereco: 'Rua $i, s/n.',
+      matricula: matricula,
+    );
+    //Observe que como Aluno é uma subclasse de Pessoa, o método 'save' do
+    //controlador de pessoa pode receber um aluno. Leia sobre polimorfismo de
+    //subtipo (ou simplesmente polimorfismo).
+    pessoaController.save(aluno);
   }
 }

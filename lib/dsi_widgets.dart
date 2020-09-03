@@ -5,35 +5,6 @@ import 'package:dsi_app/infra.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-final dsiDialog = _DsiDialog();
-
-class _DsiDialog {
-  void showInfo(
-      {@required context,
-      title = 'Sucesso',
-      message = 'Operação realizada com sucesso.',
-      buttonLabel = 'Fechar',
-      buttonPressed}) {
-    var dialog = AlertDialog(
-      title: Text(title),
-      content: Text(message),
-      actions: <Widget>[
-        FlatButton(
-          child: Text(buttonLabel),
-          onPressed: () {
-            if (buttonPressed != null) {
-              buttonPressed();
-            } else {
-              Navigator.of(context).pop();
-            }
-          },
-        ),
-      ],
-    );
-    showDialog(context: context, child: dialog);
-  }
-}
-
 /// Este Scaffold é customizado para incluir o 'body' dentro de um scrollview,
 /// evitando o overflow da tela, em telas maiores que o tamanho da tela do
 /// aparelho. Esta primeira implementação considera apenas o Scaffold com o
@@ -127,13 +98,21 @@ class DsiScaffold extends StatelessWidget {
           Divider(),
           ListTile(
             leading: Icon(Icons.people),
+            title: Text('Pessoas'),
+            onTap: () => dsiHelper.go(context, '/list_pessoa'),
+          ),
+          ListTile(
+            leading: Icon(Icons.book),
             title: Text('Alunos'),
             onTap: () => dsiHelper.go(context, '/list_aluno'),
           ),
           ListTile(
             leading: Icon(Icons.school),
             title: Text('Professores'),
-            onTap: () => dsiHelper.go(context, '/list_professor'),
+            onTap: () => dsiHelper.showMessage(
+              context: context,
+              message: 'Falta implementar.',
+            ),
           ),
           Divider(),
           ListTile(
@@ -153,14 +132,20 @@ class DsiScaffold extends StatelessWidget {
       title: title != null ? Text(title) : null,
       actions: <Widget>[
         IconButton(
-          onPressed: () => print('search'),
+          onPressed: () => dsiHelper.showMessage(
+            context: context,
+            message: 'Falta implementar',
+          ),
           icon: Icon(
             Icons.search,
             color: Colors.white,
           ),
         ),
         IconButton(
-          onPressed: () => print('notifications'),
+          onPressed: () => dsiHelper.showMessage(
+            context: context,
+            message: 'Falta implementar',
+          ),
           icon: Icon(
             Icons.notifications,
             color: Colors.white,
@@ -175,7 +160,10 @@ class DsiScaffold extends StatelessWidget {
             if (value == 'sair')
               dsiHelper.exit(context)
             else if (value == 'pref')
-              dsiDialog.showInfo(context: context, message: 'Falta implementar')
+              dsiHelper.showAlert(
+                context: context,
+                message: 'Falta implementar',
+              )
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry>[
             PopupMenuItem(

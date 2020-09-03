@@ -11,7 +11,9 @@ class RegisterPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Container(
           height: dsiHelper.getScreenHeight(context),
-          child: Column(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            runSpacing: Constants.spaceSmallHeight.height,
             children: <Widget>[
               Spacer(),
               Image(
@@ -40,17 +42,13 @@ class RegisterFormState extends State<RegisterForm> {
   void _register() {
     if (!_formKey.currentState.validate()) return;
 
-    dsiDialog.showInfo(
+    dsiHelper.showAlert(
       context: context,
       message: 'Seu cadastro foi realizado com sucesso.',
-      buttonPressed: () => dsiHelper..back(context)..back(context),
+      onPressed: () => dsiHelper..back(context)..back(context),
     );
-
-    //A linha acima é equivalente a executar as duas linhas abaixo:
-    //Navigator.of(context).pop();
-    //Navigator.of(context).pop();
-    //
-    //Para maiores informações, leia sobre 'cascade notation' no Dart.
+    //Para maiores informações sobre o uso do "..",
+    //leia sobre 'cascade notation' no Dart.
     //https://dart.dev/guides/language/language-tour
   }
 
