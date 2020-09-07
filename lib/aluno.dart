@@ -12,10 +12,36 @@ import 'package:flutter/material.dart';
 class Aluno extends Pessoa {
   String matricula;
 
-  //Observe que o construtor de aluno repassa alguns dos parâmetros recebidos
+  //TIP Observe que o construtor de aluno repassa alguns dos parâmetros recebidos
   //para o construtor da super classe (Pessoa).
   Aluno({cpf, nome, endereco, this.matricula})
       : super(cpf: cpf, nome: nome, endereco: endereco);
+
+  //TIP Observe que é delegada para a superclasse a conversão dos seus
+  //atributos específicos. Esta chamada deve ser a última coisa a ser feita
+  //no construtor.
+  Aluno.fromJson(Map<String, dynamic> json)
+      : matricula = json['matricula'],
+        super.fromJson(json);
+
+  ///TIP este método converte o objeto atual para um mapa que representa um
+  ///objeto JSON. Observe que a conversão do objeto endereço é delegada para
+  ///o próprio objeto, seguindo o princípio do encapsulamento.
+  ///Observe o uso do cascade notation do flutter. Caso este atalho não fosse
+  ///usado, seria preciso criar o método com corpo, chamando o super.toJson()
+  ///e atribuindo o mapa a uma variável, em seguida adicionar as novas entradas
+  ///no mapa, para só então retornar o mapa como resultado do método:
+  ///``
+  ///var result = super.toJson();
+  ///result.addAll({
+  ///       'matricula': matricula,
+  ///     });
+  ///return result;
+  ///``
+  Map<String, dynamic> toJson() => super.toJson()
+    ..addAll({
+      'matricula': matricula,
+    });
 }
 
 var alunoController = AlunoController();
@@ -78,23 +104,17 @@ class ListAlunoPageState extends State<ListAlunoPage> {
         color: Colors.red,
         child: Row(
           children: <Widget>[
-            Constants.spaceSmallWidth,
+            Constants.boxSmallWidth,
             Icon(Icons.delete, color: Colors.white),
             Spacer(),
             Icon(Icons.delete, color: Colors.white),
-            Constants.spaceSmallWidth,
+            Constants.boxSmallWidth,
           ],
         ),
       ),
       child: ListTile(
         title: Text(aluno.nome),
-        subtitle: Column(
-          children: <Widget>[
-            Text('id. ${aluno.id} (NUNCA APRENSETE O ID DE UM REGISTRO!)'),
-            SizedBox(width: 8.0),
-            Text('mat. ${aluno.matricula}'),
-          ],
-        ),
+        subtitle: Text('mat. ${aluno.matricula}'),
         onTap: () => dsiHelper.go(context, "/maintain_aluno", arguments: aluno),
       ),
     );
@@ -117,38 +137,9 @@ class MaintainAlunoPage extends StatelessWidget {
       },
       body: Wrap(
         alignment: WrapAlignment.center,
-        runSpacing: Constants.spaceSmallHeight.height,
+        runSpacing: Constants.boxSmallHeight.height,
         children: <Widget>[
-          TextFormField(
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'CPF*'),
-            validator: (String value) {
-              return value.isEmpty ? 'CPF inválido.' : null;
-            },
-            initialValue: aluno.cpf,
-            onSaved: (newValue) => aluno.cpf = newValue,
-          ),
-          Constants.spaceSmallHeight,
-          TextFormField(
-            keyboardType: TextInputType.text,
-            decoration: const InputDecoration(labelText: 'Nome*'),
-            validator: (String value) {
-              return value.isEmpty ? 'Nome inválido.' : null;
-            },
-            initialValue: aluno.nome,
-            onSaved: (newValue) => aluno.nome = newValue,
-          ),
-          Constants.spaceSmallHeight,
-          TextFormField(
-            keyboardType: TextInputType.text,
-            decoration: const InputDecoration(labelText: 'Endereço*'),
-            validator: (String value) {
-              return value.isEmpty ? 'Endereço inválido.' : null;
-            },
-            initialValue: aluno.endereco,
-            onSaved: (newValue) => aluno.endereco = newValue,
-          ),
-          Constants.spaceSmallHeight,
+          MaintainPessoaBody(aluno),
           TextFormField(
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(labelText: 'Matrícula*'),

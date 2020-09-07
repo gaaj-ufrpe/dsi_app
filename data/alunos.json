@@ -1,0 +1,82 @@
+[
+  { "id": 1, "cpf": "000.000.000-01", "nome":  "Aluno 1", "matricula": "000001",
+    "endereco": {"logradouro": "Rua 1","numero": "1", "bairro": "Bairro 1", "cidade": "Cidade 1",
+      "estado": "PE", "cep": "00000001"}
+  },
+  { "id": 2, "cpf": "000.000.000-02", "nome":  "Aluno 2", "matricula": "000002",
+    "endereco": {"logradouro": "Rua 2","numero": "2", "bairro": "Bairro 2", "cidade": "Cidade 2",
+      "estado": "PB", "cep": "00000002"}
+  },
+  { "id": 3, "cpf": "000.000.000-03", "nome":  "Aluno 3", "matricula": "000003",
+    "endereco": {"logradouro": "Rua 3","numero": "3", "bairro": "Bairro 3", "cidade": "Cidade 3",
+      "estado": "PE", "cep": "00000003"}
+  },
+  { "id": 4, "cpf": "000.000.000-04", "nome":  "Aluno 4", "matricula": "000004",
+    "endereco": {"logradouro": "Rua 4","numero": "4", "bairro": "Bairro 4", "cidade": "Cidade 4",
+      "estado": "PI", "cep": "00000004"}
+  },
+  { "id": 5, "cpf": "000.000.000-05", "nome":  "Aluno 5", "matricula": "000005",
+    "endereco": {"logradouro": "Rua 5","numero": "5", "bairro": "Bairro 5", "cidade": "Cidade 5",
+      "estado": "SP", "cep": "00000005"}
+  },
+  { "id": 6, "cpf": "000.000.000-06", "nome":  "Aluno 6", "matricula": "000006",
+    "endereco": {"logradouro": "Rua 6","numero": "6", "bairro": "Bairro 6", "cidade": "Cidade 6",
+      "estado": "PE", "cep": "00000006"}
+  },
+  { "id": 7, "cpf": "000.000.000-07", "nome":  "Aluno 7", "matricula": "000007",
+    "endereco": {"logradouro": "Rua 7","numero": "7", "bairro": "Bairro 7", "cidade": "Cidade 7",
+      "estado": "PA", "cep": "00000007"}
+  },
+  { "id": 8, "cpf": "000.000.000-08", "nome":  "Aluno 8", "matricula": "000008",
+    "endereco": {"logradouro": "Rua 8","numero": "8", "bairro": "Bairro 8", "cidade": "Cidade 8",
+      "estado": "PB", "cep": "00000008"}
+  },
+  { "id": 9, "cpf": "000.000.000-09", "nome":  "Aluno 9", "matricula": "000009",
+    "endereco": {"logradouro": "Rua 9","numero": "9", "bairro": "Bairro 9", "cidade": "Cidade 9",
+      "estado": "AC", "cep": "00000009"}
+  },
+  { "id": 10, "cpf": "000.000.000-10", "nome":  "Aluno 10", "matricula": "000010",
+    "endereco": {"logradouro": "Rua 10","numero": "10", "bairro": "Bairro 10", "cidade": "Cidade 10",
+      "estado": "CE", "cep": "00000010"}
+  },
+  { "id": 11, "cpf": "000.000.000-11", "nome":  "Aluno 11", "matricula": "000011",
+    "endereco": {"logradouro": "Rua 11","numero": "11", "bairro": "Bairro 11", "cidade": "Cidade 11",
+      "estado": "RR", "cep": "00000011"}
+  },
+  { "id": 12, "cpf": "000.000.000-12", "nome":  "Aluno 12", "matricula": "000012",
+    "endereco": {"logradouro": "Rua 12","numero": "12", "bairro": "Bairro 12", "cidade": "Cidade 12",
+      "estado": "RN", "cep": "00000012"}
+  },
+  { "id": 13, "cpf": "000.000.000-13", "nome":  "Aluno 13", "matricula": "000013",
+    "endereco": {"logradouro": "Rua 13","numero": "13", "bairro": "Bairro 13", "cidade": "Cidade 13",
+      "estado": "RO", "cep": "00000013"}
+  },
+  { "id": 14, "cpf": "000.000.000-14", "nome":  "Aluno 14", "matricula": "000014",
+    "endereco": {"logradouro": "Rua 14","numero": "14", "bairro": "Bairro 14", "cidade": "Cidade 14",
+      "estado": "PE", "cep": "00000014"}
+  },
+  { "id": 15, "cpf": "000.000.000-15", "nome":  "Aluno 15", "matricula": "000015",
+    "endereco": {"logradouro": "Rua 15","numero": "15", "bairro": "Bairro 15", "cidade": "Cidade 15",
+      "estado": "AM", "cep": "00000015"}
+  },
+  { "id": 16, "cpf": "000.000.000-16", "nome":  "Aluno 16", "matricula": "000016",
+    "endereco": {"logradouro": "Rua 16","numero": "16", "bairro": "Bairro 16", "cidade": "Cidade 16",
+      "estado": "SE", "cep": "00000016"}
+  },
+  { "id": 17, "cpf": "000.000.000-17", "nome":  "Aluno 17", "matricula": "000017",
+    "endereco": {"logradouro": "Rua 17","numero": "17", "bairro": "Bairro 17", "cidade": "Cidade 17",
+      "estado": "MA", "cep": "00000017"}
+  },
+  { "id": 18, "cpf": "000.000.000-18", "nome":  "Aluno 18", "matricula": "000018",
+    "endereco": {"logradouro": "Rua 18","numero": "18", "bairro": "Bairro 18", "cidade": "Cidade 18",
+      "estado": "PB", "cep": "00000018"}
+  },
+  { "id": 19, "cpf": "000.000.000-19", "nome":  "Aluno 19", "matricula": "000019",
+    "endereco": {"logradouro": "Rua 19","numero": "19", "bairro": "Bairro 19", "cidade": "Cidade 19",
+      "estado": "AL", "cep": "00000019"}
+  },
+  { "id": 20, "cpf": "000.000.000-20", "nome":  "Aluno 20", "matricula": "000020",
+    "endereco": {"logradouro": "Rua 20","numero": "20", "bairro": "Bairro 20", "cidade": "Cidade 20",
+      "estado": "BA", "cep": "00000020"}
+  }
+]

@@ -13,14 +13,14 @@ class RegisterPage extends StatelessWidget {
           height: dsiHelper.getScreenHeight(context),
           child: Wrap(
             alignment: WrapAlignment.center,
-            runSpacing: Constants.spaceSmallHeight.height,
+            runSpacing: Constants.boxSmallHeight.height,
             children: <Widget>[
               Spacer(),
               Image(
                 image: Images.bsiLogo,
                 height: 100,
               ),
-              Constants.spaceSmallHeight,
+              Constants.boxSmallHeight,
               RegisterForm(),
               Spacer(),
             ],
@@ -61,7 +61,7 @@ class RegisterFormState extends State<RegisterForm> {
     return Form(
       key: _formKey,
       child: Padding(
-        padding: Constants.paddingMedium,
+        padding: Constants.insetsMedium,
         child: Column(
           children: <Widget>[
             TextFormField(
@@ -71,7 +71,7 @@ class RegisterFormState extends State<RegisterForm> {
                 return value.isEmpty ? 'Email inválido.' : null;
               },
             ),
-            Constants.spaceSmallHeight,
+            Constants.boxSmallHeight,
             TextFormField(
               keyboardType: TextInputType.text,
               decoration: const InputDecoration(labelText: 'Login*'),
@@ -79,7 +79,7 @@ class RegisterFormState extends State<RegisterForm> {
                 return value.isEmpty ? 'Login inválido.' : null;
               },
             ),
-            Constants.spaceSmallHeight,
+            Constants.boxSmallHeight,
             TextFormField(
               keyboardType: TextInputType.visiblePassword,
               obscureText: true,
@@ -88,7 +88,7 @@ class RegisterFormState extends State<RegisterForm> {
                 return value.isEmpty ? 'Senha inválida.' : null;
               },
             ),
-            Constants.spaceSmallHeight,
+            Constants.boxSmallHeight,
             TextFormField(
               keyboardType: TextInputType.visiblePassword,
               obscureText: true,
@@ -100,7 +100,7 @@ class RegisterFormState extends State<RegisterForm> {
                     : null;
               },
             ),
-            Constants.spaceMediumHeight,
+            Constants.boxMediumHeight,
             SizedBox(
               width: double.infinity,
               child: RaisedButton(
@@ -110,7 +110,7 @@ class RegisterFormState extends State<RegisterForm> {
             ),
             FlatButton(
               child: Text('Cancelar'),
-              padding: Constants.paddingSmall,
+              padding: Constants.insetsSmall,
               onPressed: _cancel,
             ),
           ],

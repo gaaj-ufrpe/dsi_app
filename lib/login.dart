@@ -20,11 +20,11 @@ class LoginPage extends StatelessWidget {
                 image: Images.bsiLogo,
                 height: 100,
               ),
-              Constants.spaceSmallHeight,
+              Constants.boxSmallHeight,
               LoginForm(),
               Spacer(),
               Padding(
-                padding: Constants.paddingMedium,
+                padding: Constants.insetsMedium,
                 child: Text(
                   'App desenvolvido por Gabriel Alves para a disciplina de'
                   ' Desenvolvimento de Sistemas de Informação do BSI/UFRPE.',
@@ -75,10 +75,10 @@ class LoginFormState extends State<LoginForm> {
     return Form(
       key: _formKey,
       child: Padding(
-        padding: Constants.paddingMedium,
+        padding: Constants.insetsMedium,
         child: Wrap(
           alignment: WrapAlignment.center,
-          runSpacing: Constants.spaceSmallHeight.height,
+          runSpacing: Constants.boxSmallHeight.height,
           children: <Widget>[
             TextFormField(
               keyboardType: TextInputType.text,
@@ -99,7 +99,7 @@ class LoginFormState extends State<LoginForm> {
               alignment: Alignment.centerRight,
               child: FlatButton(
                 child: Text('Esqueceu a senha?'),
-                padding: Constants.paddingSmall.copyWith(top: 0.0),
+                padding: Constants.insetsSmall.copyWith(top: 0.0),
                 onPressed: _forgotPassword,
               ),
             ),
@@ -112,7 +112,7 @@ class LoginFormState extends State<LoginForm> {
             ),
             FlatButton(
               child: Text('Cadastre-se'),
-              padding: Constants.paddingSmall,
+              padding: Constants.insetsSmall,
               onPressed: _register,
             ),
           ],

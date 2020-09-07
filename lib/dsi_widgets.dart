@@ -207,12 +207,12 @@ class DsiBasicFormPageState<T> extends State<DsiBasicFormPage> {
         child: Form(
           key: formKey,
           child: Padding(
-            padding: Constants.paddingMedium,
+            padding: Constants.insetsMedium,
             child: Column(
               children: <Widget>[
-                Constants.spaceMediumHeight,
+                Constants.boxMediumHeight,
                 widget.body,
-                Constants.spaceMediumHeight,
+                Constants.boxMediumHeight,
                 _buildFormButtons(),
               ],
             ),
@@ -242,7 +242,7 @@ class DsiBasicFormPageState<T> extends State<DsiBasicFormPage> {
         ),
         FlatButton(
           child: Text('Cancelar'),
-          padding: Constants.paddingSmall,
+          padding: Constants.insetsSmall,
           onPressed: () => dsiHelper.back(context),
         ),
       ],
