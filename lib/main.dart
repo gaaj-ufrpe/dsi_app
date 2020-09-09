@@ -89,13 +89,9 @@ void _initDb(context) {
 }
 
 _processData(jsonString) {
-  Map<String, dynamic> jsonMaps =
-      json.decode(jsonString).cast<Map<String, dynamic>>();
-  _processAlunos(jsonMaps['alunos']);
-}
-
-_processAlunos(jsonAlunos) {
-  List<Aluno> alunos =
-      jsonAlunos.map<Aluno>((json) => Aluno.fromJson(json)).toList();
-  alunos.forEach((aluno) => alunoController.save(aluno));
+  Map<String, dynamic> jsonMaps = jsonDecode(jsonString);
+  jsonMaps['alunos']
+      .map<Aluno>((json) => Aluno.fromJson(json))
+      .toList()
+      .forEach((aluno) => alunoController.save(aluno));
 }
