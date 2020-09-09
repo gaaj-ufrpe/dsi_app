@@ -84,13 +84,18 @@ void _initDb(context) {
   //Observe ainda que não está mais sendo usado o 'for'. Agora já estamos
   //usando o método 'forEach' das listas, que chama uma função para cada
   //elemento da lista.
-  Future<String> alunosData =
-      DefaultAssetBundle.of(context).loadString('data/alunos.json');
-  alunosData.then((value) {
-    List<Map<String, dynamic>> jsonMaps =
-        json.decode(value).cast<Map<String, dynamic>>();
-    List<Aluno> alunos =
-        jsonMaps.map<Aluno>((json) => Aluno.fromJson(json)).toList();
-    alunos.forEach((aluno) => alunoController.save(aluno));
-  });
+  Future<String> data = DefaultAssetBundle.of(context).loadString('db.json');
+  data.then((value) => _processData(value));
+}
+
+_processData(jsonString) {
+  Map<String, dynamic> jsonMaps =
+      json.decode(jsonString).cast<Map<String, dynamic>>();
+  _processAlunos(jsonMaps['alunos']);
+}
+
+_processAlunos(jsonAlunos) {
+  List<Aluno> alunos =
+      jsonAlunos.map<Aluno>((json) => Aluno.fromJson(json)).toList();
+  alunos.forEach((aluno) => alunoController.save(aluno));
 }
