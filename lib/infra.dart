@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/src/response.dart';
 
 final dsiHelper = _DsiHelper();
 
@@ -70,5 +71,13 @@ class _DsiHelper {
       context: context,
       builder: (context) => dialog,
     );
+  }
+
+  bool isOK(Response response) {
+    return response.statusCode >= 200 && response.statusCode < 300;
+  }
+
+  bool isFail(Response response) {
+    return !isOK(response);
   }
 }

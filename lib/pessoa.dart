@@ -1,7 +1,11 @@
+import 'dart:convert';
+
+import 'package:dsi_app/aluno.dart';
 import 'package:dsi_app/constants.dart';
 import 'package:dsi_app/dsi_widgets.dart';
 import 'package:dsi_app/infra.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class Estado {
   static final Estado AC = Estado._('Acre', 'AC');
@@ -156,14 +160,25 @@ var pessoaController = PessoaController();
 
 class PessoaController {
   var _nextId = 1;
-  var _pessoas = <Pessoa>[];
 
-  List<Pessoa> getAll() {
-    return _pessoas;
+  Future<List<Pessoa>> getAll() async {
+    var url = '${Constants.server}/alunos';
+    final response = await http.get(url);
+    List<Map<String, dynamic>> jsonMaps = jsonDecode(response.body);
+    if (dsiHelper.isOK(response)) {
+      return jsonMaps.map((json) => Aluno.fromJson(json)).toList();
+    } else {
+      throw Exception('Falha ao carregar as pessoas.');
+    }
   }
 
-  Pessoa getByCPF(String cpf) {
-    for (Pessoa p in _pessoas) {
+  Future<Pessoa> getByCPF(String cpf) {
+    getAll().then((value) => value.)
+
+    var url = '${Constants.server}/alunos';
+
+    getAll().then((value) => )
+    for (Pessoa p in ) {
       if (p.cpf == cpf) return p;
     }
     return null;
