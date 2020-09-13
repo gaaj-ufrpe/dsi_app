@@ -47,15 +47,22 @@ class Aluno extends Pessoa {
 var alunoController = AlunoController();
 
 class AlunoController {
-  List<Aluno> getAll() {
-    return pessoaController.getAll().whereType<Aluno>().toList();
+  Future<List<Aluno>> getAll() async {
+    List<Pessoa> result = await pessoaController.getAll();
+    return result.whereType<Aluno>().toList();
   }
 
-  Aluno save(aluno) {
-    return pessoaController.save(aluno);
+  Future<Aluno> save(Aluno aluno) async {
+    Pessoa pessoa = await pessoaController.save(aluno);
+    //TIP aqui foi feito um cast de pessoa para aluno, para garantir que o
+    // objeto retornado é um aluno e não uma pessoa. Caso isso não fosse feito,
+    // daria uma erro no 'Future' que seria de pessoa e não de aluno, como
+    // declarado no retorno da função. A outra alternativa, seria usar o
+    // retorno dinâmico.
+    return pessoa as Aluno;
   }
 
-  bool remove(aluno) {
+  Future<bool> remove(Aluno aluno) async {
     return pessoaController.remove(aluno);
   }
 }
@@ -66,8 +73,16 @@ class ListAlunoPage extends StatefulWidget {
 }
 
 class ListAlunoPageState extends State<ListAlunoPage> {
-  List<Aluno> _alunos = alunoController.getAll();
+  Future<List<Aluno>> _alunos;
 
+  @override
+  void initState() {
+    super.initState();
+    _alunos = alunoController.getAll();
+  }
+
+  ///TIP Como a listagem agora trabalha sobre o Future de alunos ao invés
+  ///do aluno em si, é necessário envolver o ListView em um FutureBuilder.
   @override
   Widget build(BuildContext context) {
     return DsiScaffold(
@@ -76,24 +91,32 @@ class ListAlunoPageState extends State<ListAlunoPage> {
         child: Icon(Icons.add),
         onPressed: () => dsiHelper.go(context, '/maintain_aluno'),
       ),
-      body: ListView.builder(
-        shrinkWrap: true,
-        scrollDirection: Axis.vertical,
-        // physics: NeverScrollableScrollPhysics(),
-        itemCount: _alunos.length,
-        itemBuilder: _buildListTileAluno,
-      ),
+      body: FutureBuilder(
+          future: _alunos,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              //TIP apresenta o indicador de progresso enquanto carrega a página.
+              return Center(child: CircularProgressIndicator());
+            }
+            var alunos = snapshot.data;
+            return ListView.builder(
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              // physics: NeverScrollableScrollPhysics(),
+              itemCount: alunos.length,
+              itemBuilder: (context, index) =>
+                  _buildListTileAluno(context, alunos[index]),
+            );
+          }),
     );
   }
 
-  Widget _buildListTileAluno(context, index) {
-    var aluno = _alunos[index];
+  Widget _buildListTileAluno(context, aluno) {
     return Dismissible(
       key: UniqueKey(),
       onDismissed: (direction) {
         setState(() {
           alunoController.remove(aluno);
-          _alunos.remove(index);
         });
         dsiHelper.showMessage(
           context: context,

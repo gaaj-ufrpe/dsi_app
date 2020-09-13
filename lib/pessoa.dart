@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:dsi_app/aluno.dart';
 import 'package:dsi_app/constants.dart';
 import 'package:dsi_app/dsi_widgets.dart';
 import 'package:dsi_app/infra.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class Estado {
   static final Estado AC = Estado._('Acre', 'AC');
@@ -93,7 +90,8 @@ class Endereco {
   Estado estado = Estado.AC;
 
   Endereco(
-      {this.logradouro,
+      {this.id,
+      this.logradouro,
       this.numero,
       this.bairro,
       this.cidade,
@@ -104,7 +102,8 @@ class Endereco {
   //conversão do objeto para um objeto JSON, o que é salvo é a sigla. Veja que
   //no método toJson o que é incluído no mapa é a sigla.
   Endereco.fromJson(Map<String, dynamic> json)
-      : logradouro = json['logradouro'],
+      : id = json['id'],
+        logradouro = json['logradouro'],
         numero = json['numero'],
         bairro = json['bairro'],
         cidade = json['cidade'],
@@ -115,6 +114,7 @@ class Endereco {
   //a sua sigla. No construtor, basta pegar a sigla salva, e recuperar o estado
   //equivalente pela sigla.
   Map<String, dynamic> toJson() => {
+        'id': id,
         'logradouro': logradouro,
         'numero': numero,
         'bairro': bairro,
@@ -159,72 +159,55 @@ abstract class Pessoa {
 var pessoaController = PessoaController();
 
 class PessoaController {
-  var _nextId = 1;
-
   Future<List<Pessoa>> getAll() async {
-    var url = '${Constants.server}/alunos';
-    final response = await http.get(url);
-    List<Map<String, dynamic>> jsonMaps = jsonDecode(response.body);
-    if (dsiHelper.isOK(response)) {
-      return jsonMaps.map((json) => Aluno.fromJson(json)).toList();
-    } else {
-      throw Exception('Falha ao carregar as pessoas.');
-    }
+    return dsiHelper.getJson<List<Pessoa>>(
+      'alunos',
+      (jsonMaps) =>
+          jsonMaps.map<Aluno>((json) => Aluno.fromJson(json)).toList(),
+    );
   }
 
-  Future<Pessoa> getByCPF(String cpf) {
-    getAll().then((value) => value.)
-
-    var url = '${Constants.server}/alunos';
-
-    getAll().then((value) => )
-    for (Pessoa p in ) {
-      if (p.cpf == cpf) return p;
-    }
-    return null;
+  Future<Pessoa> getById(int id) async {
+    return dsiHelper.getJson<Pessoa>(
+      'alunos/$id',
+      (json) => Aluno.fromJson(json),
+    );
   }
 
-  void _validateOnSave(pessoa) {
-    Pessoa p = getByCPF(pessoa.cpf);
+  Future<Pessoa> getByCPF(String cpf) async {
+    var params = {
+      'cpf': cpf,
+    };
+    List<Pessoa> result = await dsiHelper.getJson<List<Pessoa>>(
+      'alunos',
+      (jsonMaps) =>
+          jsonMaps.map<Aluno>((json) => Aluno.fromJson(json)).toList(),
+      params,
+    );
+    return result != null && result.isNotEmpty ? result.first : null;
+  }
+
+  void validateOnSave(pessoa) async {
+    Pessoa p = await getByCPF(pessoa.cpf);
     if (p != null && p.id != pessoa.id)
       throw Exception('Já existe uma pessoa com o cpf ${pessoa.cpf}.');
   }
 
-  Pessoa save(pessoa) {
-    _validateOnSave(pessoa);
-    //Lógica:
-    //1) se a pessoa não possui id, está inserindo.
-    //2) se a pessoa tem id e o id não está na lista do banco, está inserindo
-    //3) caso contrário, está alterando.
-    //
-    //No caso 2, altera o próximo ID para o máximo entre o id da pessoa
-    //e o atual;
-    //
-    //No caso 3, substitui a pessoa da lista, na mesma posição.
-    if (pessoa.id == null) {
-      pessoa.id = _nextId++;
-      pessoa.endereco.id = pessoa.id;
-      _pessoas.add(pessoa);
-    } else {
-      var idx = _pessoas.indexWhere((element) => element.id == pessoa.id);
-      if (idx == -1) {
-        _pessoas.add(pessoa);
-        _nextId = pessoa.id > _nextId ? pessoa.id + 1 : _nextId + 1;
-      } else {
-        _pessoas.setRange(idx, idx + 1, [pessoa]);
-      }
-    }
-    return pessoa;
+  Future<Pessoa> save(pessoa) async {
+    validateOnSave(pessoa);
+    return dsiHelper.putJson(
+      'alunos',
+      pessoa.id,
+      (json) => Aluno.fromJson(json),
+      pessoa.toJson(),
+    );
   }
 
-  bool remove(pessoa) {
-    var result = false;
-    var idx = _pessoas.indexWhere((element) => element.id == pessoa.id);
-    if (idx != -1) {
-      result = true;
-      _pessoas.removeAt(idx);
-    }
-    return result;
+  Future<bool> remove(pessoa) async {
+    return dsiHelper.deleteJson(
+      'alunos',
+      pessoa.id,
+    );
   }
 }
 
@@ -234,29 +217,46 @@ class ListPessoaPage extends StatefulWidget {
 }
 
 class ListPessoaPageState extends State<ListPessoaPage> {
-  List<Pessoa> _pessoas = pessoaController.getAll();
+  Future<List<Pessoa>> _pessoas;
+
+  ///TIP O estado dos componentes stateful devem ser inicializados
+  ///no método initState.
+  @override
+  void initState() {
+    super.initState();
+    _pessoas = pessoaController.getAll();
+  }
 
   @override
   Widget build(BuildContext context) {
     return DsiScaffold(
       title: 'Listagem de Pessoas',
-      body: ListView.builder(
-        shrinkWrap: true,
-        scrollDirection: Axis.vertical,
-        itemCount: _pessoas.length,
-        itemBuilder: _buildListTilePessoa,
+      body: FutureBuilder(
+        future: _pessoas,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            //TIP apresenta o indicador de progresso enquanto carrega a página.
+            return Center(child: CircularProgressIndicator());
+          }
+          var pessoas = snapshot.data;
+          return ListView.builder(
+            shrinkWrap: true,
+            scrollDirection: Axis.vertical,
+            itemCount: pessoas.length,
+            itemBuilder: (context, index) =>
+                _buildListTilePessoa(context, pessoas[index]),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildListTilePessoa(context, index) {
-    var pessoa = _pessoas[index];
+  Widget _buildListTilePessoa(context, pessoa) {
     return Dismissible(
       key: UniqueKey(),
       onDismissed: (direction) {
         setState(() {
           pessoaController.remove(pessoa);
-          _pessoas.remove(index);
         });
         dsiHelper.showMessage(
           context: context,

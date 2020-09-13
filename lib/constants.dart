@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Constants {
-  static var server = 'https://my-json-server.typicode.com/gaaj-ufrpe/dsi_app';
   static const appName = 'DSI App';
   static const title = 'CRUD App - DSI/BSI/UFRPE';
   static const spaceSmall = 8.0;
