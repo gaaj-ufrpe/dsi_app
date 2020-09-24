@@ -124,7 +124,7 @@ class Endereco {
       };
 }
 
-class Pessoa {
+abstract class Pessoa {
   String id, cpf, nome;
   Endereco endereco;
   Pessoa({this.id, this.cpf, this.nome, this.endereco}) {
@@ -161,15 +161,20 @@ class PessoaController {
   Future<List<Pessoa>> getAll() async {
     return dsiHelper.getJson<List<Pessoa>>(
       'alunos',
-      (jsonMaps) =>
-          jsonMaps.map<Aluno>((json) => Aluno.fromJson(json)).toList(),
+      (jsonMaps) {
+        return jsonMaps.map<Aluno>(
+                (json) {
+                  return Aluno.fromJson(json);
+                }
+        ).toList();
+      }
     );
   }
 
   Future<Pessoa> getById(String id) async {
     return dsiHelper.getJson<Pessoa>(
-      'pessoas/$id',
-      (json) => Pessoa.fromJson(json),
+      'alunos/$id',
+      (json) => Aluno.fromJson(json),
     );
   }
 
@@ -193,15 +198,13 @@ class PessoaController {
   }
 
   Future<Pessoa> save(pessoa) async {
-    validateOnSave(pessoa);
-    //FIXME
-    return null;
-    // return dsiHelper.putJson(
-    //   'alunos',
-    //   pessoa.id,
-    //   (json) => Aluno.fromJson(json),
-    //   pessoa.toJson(),
-    // );
+    // validateOnSave(pessoa);
+    return dsiHelper.putJson(
+      'alunos',
+      pessoa.id,
+      (json) => Aluno.fromJson(json),
+      pessoa.toJson(),
+    );
   }
 
   Future<bool> remove(pessoa) async {
@@ -235,10 +238,27 @@ class ListPessoaPageState extends State<ListPessoaPage> {
       body: FutureBuilder(
         future: _pessoas,
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState != ConnectionState.active) {
             //TIP apresenta o indicador de progresso enquanto carrega a página.
             return Center(child: CircularProgressIndicator());
           }
+
+          if (snapshot.hasError) {
+            print(snapshot.error);
+            return Center(
+              child: Text('Erro ao carregar a lista.',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 16.0,
+                ),
+              ),
+            );
+          }
+
+          if (!snapshot.hasData) {
+            return Center(child: Text('Nenhuma pessoa cadastrada.'));
+          }
+
           var pessoas = snapshot.data;
           return ListView.builder(
             shrinkWrap: true,

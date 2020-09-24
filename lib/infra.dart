@@ -88,10 +88,13 @@ class _DsiHelper {
     return !isOK(response);
   }
 
-  var _server = 'my-json-server.typicode.com';
+  ///TIP: para montar a URI usando o URI.https, o servidor precisa estar neste
+  ///formato abaixo. Ou seja, não deve informar as barras ou o http ou https.
+  var _server = 'firestore.googleapis.com';
 
-  String _path(String res, [int id]) {
-    String result = 'gaaj-ufrpe/dsi_app/${res}';
+  String _path(String res, [String id]) {
+    String result = 'v1/projects/dsi-app-6ed12/databases/(default)/'
+        'documents/${res}';
     if (id != null) result = '$result/$id';
     return result;
   }
@@ -117,23 +120,29 @@ class _DsiHelper {
     return _parseResponse(response, fromJson);
   }
 
-  Future<T> putJson<T>(String res, int id,
+  Future<T> putJson<T>(String res, String id,
       T fromJson(Map<String, dynamic> json), Map<String, dynamic> body) async {
     http.Response response = await _insertOrUpdate(res, id, body);
     return _parseResponse(response, fromJson);
   }
 
   dynamic _parseResponse(http.Response response, fromJson) {
+    print('response: $response');
+    print('response code: ${response.statusCode}');
+    print('response body: ${response.body}');
+
     if (isOK(response)) {
       var jsonResponse = jsonDecode(response.body);
-      return fromJson(jsonResponse);
+      //TIP no firebase, a resposta é um mapa cuja chave é 'documents'.
+      var jsonMaps = jsonResponse['documents'];
+      return jsonMaps != null ? fromJson(jsonMaps) : null;
     } else {
       throw Exception('Falha ao carregar os dados.');
     }
   }
 
   Future<http.Response> _insertOrUpdate(
-      String res, int id, Map<String, dynamic> body) async {
+      String res, String id, Map<String, dynamic> body) async {
     var uri = Uri.https(_server, _path(res, id));
     if (id == null) {
       return http.post(uri, body: jsonEncode(body), headers: {
@@ -146,7 +155,7 @@ class _DsiHelper {
     }
   }
 
-  Future<bool> deleteJson(String res, int id) async {
+  Future<bool> deleteJson(String res, String id) async {
     var uri = Uri.https(_server, _path(res, id));
     var response = await http.delete(uri, headers: {
       HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',

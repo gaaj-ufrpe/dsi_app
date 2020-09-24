@@ -4,30 +4,44 @@ import 'package:dsi_app/infra.dart';
 import 'package:dsi_app/pessoa.dart';
 import 'package:flutter/material.dart';
 
-/// A classe aluno representa um aluno do sistema e possui uma Pessoa.
-/// Caso aluno fosse uma subclasse de pessoa (como aconteceu nos branches
-/// anteriores), não seria possível ter uma pessoa que fosse ao mesmo tempo
-/// um aluno e um professor.
-/// Assim, caso a mesma pessoa seja aluno e professor, basta que ambos registros
-/// (de aluno e de professor) apontem para a mesma pessoa.
-class Aluno {
-  String id, matricula;
-  Pessoa pessoa;
+/// A classe aluno representa um aluno do sistema e é uma subclasse de Pessoa.
+/// Assim, tudo o que Pessoa possui, um aluno também possui.
+/// E todas as operações que podem ser feitas com uma pessoa, também podem ser
+/// feitas com um aluno. Assim, todos os métodos e funções que recebiam uma
+/// Pessoa como parâmetro, também podem receber também um Aluno.
+class Aluno extends Pessoa {
+  String matricula;
 
-  Aluno({this.id, this.matricula, this.pessoa});
+  //TIP Observe que o construtor de aluno repassa alguns dos parâmetros recebidos
+  //para o construtor da super classe (Pessoa).
+  Aluno({cpf, nome, endereco, this.matricula})
+      : super(cpf: cpf, nome: nome, endereco: endereco);
 
   //TIP Observe que é delegada para a superclasse a conversão dos seus
   //atributos específicos. Esta chamada deve ser a última coisa a ser feita
   //no construtor.
   Aluno.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
-        matricula = json['matricula'],
-        pessoa = Pessoa.fromJson(json['pessoa']);
+      : matricula = json['matricula'],
+        super.fromJson(json);
 
   ///TIP este método converte o objeto atual para um mapa que representa um
-  ///objeto JSON.
-  Map<String, dynamic> toJson() =>
-      {'id': id, 'matricula': matricula, 'id_pessoa': pessoa.id};
+  ///objeto JSON. Observe que a conversão do objeto endereço é delegada para
+  ///o próprio objeto, seguindo o princípio do encapsulamento.
+  ///Observe o uso do cascade notation do flutter. Caso este atalho não fosse
+  ///usado, seria preciso criar o método com corpo, chamando o super.toJson()
+  ///e atribuindo o mapa a uma variável, em seguida adicionar as novas entradas
+  ///no mapa, para só então retornar o mapa como resultado do método:
+  ///``
+  ///var result = super.toJson();
+  ///result.addAll({
+  ///       'matricula': matricula,
+  ///     });
+  ///return result;
+  ///``
+  Map<String, dynamic> toJson() => super.toJson()
+    ..addAll({
+      'matricula': matricula,
+    });
 }
 
 var alunoController = AlunoController();
@@ -35,7 +49,7 @@ var alunoController = AlunoController();
 class AlunoController {
   Future<List<Aluno>> getAll() async {
     List<Pessoa> result = await pessoaController.getAll();
-    return result.whereType<Aluno>().toList();
+    return result?.whereType<Aluno>()?.toList();
   }
 
   Future<Aluno> save(Aluno aluno) async {
@@ -80,9 +94,25 @@ class ListAlunoPageState extends State<ListAlunoPage> {
       body: FutureBuilder(
           future: _alunos,
           builder: (context, snapshot) {
-            if (!snapshot.hasData) {
+            if (snapshot.connectionState != ConnectionState.done) {
               //TIP apresenta o indicador de progresso enquanto carrega a página.
               return Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError) {
+              print(snapshot.error);
+              return Center(
+                child: Text('Erro ao carregar a lista.',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 16.0,
+                  ),
+                ),
+              );
+            }
+
+            if (!snapshot.hasData) {
+              return Center(child: Text('Nenhum aluno cadastrado.'));
             }
             var alunos = snapshot.data;
             return ListView.builder(
@@ -148,7 +178,7 @@ class MaintainAlunoPage extends StatelessWidget {
         alignment: WrapAlignment.center,
         runSpacing: Constants.boxSmallHeight.height,
         children: <Widget>[
-          MaintainPessoaBody(aluno.pessoa),
+          MaintainPessoaBody(aluno),
           TextFormField(
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(labelText: 'Matrícula*'),
