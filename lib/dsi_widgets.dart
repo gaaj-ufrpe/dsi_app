@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:dsi_app/constants.dart';
@@ -181,11 +182,32 @@ class DsiScaffold extends StatelessWidget {
   }
 }
 
+class DsiTitle extends StatelessWidget {
+  final String title;
+  DsiTitle(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Text(
+        '$title',
+        style:
+            Theme.of(context).textTheme.headline1.copyWith(color: Colors.white),
+      ),
+      height: 50.0,
+      width: double.infinity,
+      color: Theme.of(context).accentColor,
+      alignment: Alignment.center,
+    );
+  }
+}
+
 class DsiBasicFormPage extends StatefulWidget {
   final String title;
   final onSave;
   final Widget body;
   final hideButtons;
+
   DsiBasicFormPage(
       {@required this.title,
       @required this.body,
@@ -202,27 +224,34 @@ class DsiBasicFormPageState<T> extends State<DsiBasicFormPage> {
   @override
   Widget build(BuildContext context) {
     return DsiScaffold(
-      title: widget.title,
-      body: SingleChildScrollView(
-        child: Form(
-          key: formKey,
-          child: Padding(
-            padding: Constants.insetsMedium,
-            child: Column(
-              children: <Widget>[
-                Constants.boxMediumHeight,
-                widget.body,
-                Constants.boxMediumHeight,
-                _buildFormButtons(),
-              ],
+      body: Form(
+        key: formKey,
+        child: Column(
+          children: <Widget>[
+            DsiTitle('${widget.title}'),
+            //TIP sempre colocar o scroll dentro de um Expanded, para evitar
+            // erro de overflow na tela.
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: Constants.insetsMedium,
+                  child: Column(
+                    children: <Widget>[
+                      widget.body,
+                      Constants.boxMediumHeight,
+                      _buildFormButtons(context),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildFormButtons() {
+  Widget _buildFormButtons(context) {
     if (widget.hideButtons) return null;
 
     return Column(
@@ -236,7 +265,7 @@ class DsiBasicFormPageState<T> extends State<DsiBasicFormPage> {
               setState(() {
                 formKey.currentState.save();
               });
-              widget.onSave.call();
+              widget.onSave(context);
             },
           ),
         ),
@@ -246,6 +275,171 @@ class DsiBasicFormPageState<T> extends State<DsiBasicFormPage> {
           onPressed: () => dsiHelper.back(context),
         ),
       ],
+    );
+  }
+}
+
+typedef DsiFutureBuilderFunction<T> = Function(BuildContext, T);
+
+class DsiFutureBuilder<T> extends StatefulWidget {
+  final FutureOr<T> target;
+  final DsiFutureBuilderFunction<T> builder;
+
+  ///TIP é importante setar a chave para atualizar corretamente a tela ao
+  ///remover ou alterar um componente.
+  DsiFutureBuilder({Key key, this.target, this.builder}) : super(key: key);
+
+  @override
+  DsiFutureBuilderState<T> createState() => DsiFutureBuilderState<T>();
+}
+
+class DsiFutureBuilderState<T> extends State<DsiFutureBuilder<T>> {
+  FutureOr<T> target;
+
+  DsiFutureBuilderState();
+
+  @override
+  void initState() {
+    super.initState();
+    this.target = widget.target;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!(target is Future)) {
+      return widget.builder(context, target);
+    }
+    return FutureBuilder(
+      future: (target as Future),
+      builder: (BuildContext context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          //TIP apresenta o indicador de progresso enquanto carrega a página.
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(
+            child: Text(
+              'Erro ao carregar os dados.',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 16.0,
+              ),
+            ),
+          );
+        }
+
+        if (!snapshot.hasData) {
+          return Center(child: Text('Nenhum dado existente.'));
+        }
+        return widget.builder(context, snapshot.data);
+      },
+    );
+  }
+}
+
+typedef DsilistDataBuilder<E> = FutureOr<List<FutureOr<E>>> Function();
+typedef DsiListTileRemover<E> = Function(BuildContext context, E object);
+typedef DsiListTileBuilder<E> = Widget Function(BuildContext context, E object);
+typedef DsiFloatingActionButtonBuilder = FloatingActionButton Function(
+    BuildContext context);
+
+class DsiListPageState<E, T extends StatefulWidget> extends State<T> {
+  String title;
+  FutureOr<List<FutureOr<E>>> listData;
+  DsilistDataBuilder<E> listDataBuilder;
+  DsiListTileRemover<E> remover;
+  DsiListTileBuilder<E> builder;
+  DsiFloatingActionButtonBuilder floatingActionButtonBuilder;
+
+  DsiListPageState(
+      {this.title,
+      this.listDataBuilder,
+      this.remover,
+      this.builder,
+      this.floatingActionButtonBuilder});
+
+  @override
+  void initState() {
+    super.initState();
+    //TIP a atualização dos objetos que são carregados na lista precisa ser
+    // feita no método initState. Caso fosse feita no construtor, ao exibir
+    // a lista após atualizar um item, a lista não seria atualizada.
+    // Todos os widgets stateful devem inicializar os valores de seus atributos
+    // neste método e não no construtor ou no build.
+    listData = listDataBuilder();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DsiScaffold(
+      floatingActionButton: floatingActionButtonBuilder?.call(context),
+      body: Builder(
+        builder: (context) {
+          return Column(
+            children: <Widget>[
+              DsiTitle(title),
+              //TIP: Se não utilizar o Expanded, o FutureBuilder não irá
+              // conseguir renderizar corretamente, dando um 'overflow' na
+              // parte inferior da tela.
+              Expanded(
+                child: buildList(context),
+              )
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget buildList(BuildContext context) {
+    return DsiFutureBuilder<List<FutureOr<E>>>(
+      key: UniqueKey(),
+      target: listData,
+      builder: (context, data) => ListView.builder(
+        shrinkWrap: true,
+        scrollDirection: Axis.vertical,
+        itemCount: data.length,
+        itemBuilder: (context, index) => buildItem(context, data[index]),
+      ),
+    );
+  }
+
+  Widget buildItem(BuildContext context, FutureOr<E> target) {
+    return DsiFutureBuilder<E>(
+      target: target,
+      builder: (context, data) => Dismissible(
+        key: UniqueKey(),
+        onDismissed: (direction) {
+          remover(context, data)
+            ..then((value) {
+              dsiHelper.showMessage(
+                context: context,
+                message: 'Item removido com sucesso.',
+              );
+              setState(() {
+                listData = listDataBuilder();
+              });
+            })
+            ..catchError((e) {
+              dsiHelper.showMessage(context: context, message: e.toString());
+              setState(() {});
+            });
+        },
+        background: Container(
+          color: Colors.red,
+          child: Row(
+            children: <Widget>[
+              Constants.boxSmallWidth,
+              Icon(Icons.delete, color: Colors.white),
+              Spacer(),
+              Icon(Icons.delete, color: Colors.white),
+              Constants.boxSmallWidth,
+            ],
+          ),
+        ),
+        child: builder(context, data),
+      ),
     );
   }
 }

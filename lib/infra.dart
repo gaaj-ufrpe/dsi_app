@@ -5,9 +5,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-final dsiHelper = _DsiHelper();
+final DsiHelper dsiHelper = DsiHelper._();
 
-class _DsiHelper {
+class DsiHelper {
+  DsiHelper._();
+
   Size getScreenSize(BuildContext context) {
     return MediaQuery.of(context).size;
   }
@@ -61,7 +63,7 @@ class _DsiHelper {
           child: Text('Fechar'),
           onPressed: () {
             if (onPressed == null) {
-              Navigator.of(context).pop();
+              Navigator.pop(context);
             } else {
               onPressed.call();
             }
@@ -75,10 +77,22 @@ class _DsiHelper {
       builder: (context) => dialog,
     );
   }
+}
 
-  bool isInsert(path, object) {
-    return object.id == null || getJson(path, (json) => Object()) == null;
-  }
+enum DsiRestMethod { GET, PUT, DELETE }
+
+///TIP: para montar a URI usando o URI.https, o servidor precisa estar neste
+///formato abaixo. Ou seja, não deve informar as barras ou o http ou https.
+const default_server = 'dsi-app-6ed12.firebaseio.com';
+
+const default_headers = {
+  HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
+};
+
+final DsiRest dsiRest = DsiRest._();
+
+class DsiRest {
+  DsiRest._();
 
   bool isOK(http.Response response) {
     return response.statusCode >= 200 && response.statusCode < 300;
@@ -88,17 +102,6 @@ class _DsiHelper {
     return !isOK(response);
   }
 
-  ///TIP: para montar a URI usando o URI.https, o servidor precisa estar neste
-  ///formato abaixo. Ou seja, não deve informar as barras ou o http ou https.
-  var _server = 'firestore.googleapis.com';
-
-  String _path(String res, [String id]) {
-    String result = 'v1/projects/dsi-app-6ed12/databases/(default)/'
-        'documents/${res}';
-    if (id != null) result = '$result/$id';
-    return result;
-  }
-
   ///TIP a palavra reservada 'await' só pode ser usada dentro de um
   ///método/função sincronizado. Ele indica que esta linha de código irá
   ///esperar até que o objeto embutido no 'Future' esteja disponível.
@@ -106,60 +109,32 @@ class _DsiHelper {
   ///Caso não fosse usado o 'await', o objeto não seria um http.Respose, mas
   ///um Future<http.Response>. Remova a palavra reservada e veja o
   ///comportamento do código.
-  ///
-  ///Caso a resposta da API REST tenha sido uma lista de mapas json, o
-  ///retorno será uma lista de objetos convertidos pela função [fromJson].
-  ///Caso a resposta tenha sido apenas um mapa, o retorno será um único
-  ///objeto convertido por esta função.
-  Future<T> getJson<T>(String res, T fromJson(json),
-      [Map<String, String> params]) async {
-    var uri = Uri.https(_server, _path(res), params);
-    var response = await http.get(uri, headers: {
-      HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-    });
-    return _parseResponse(response, fromJson);
-  }
+  Future<T> call<T>(
+      {String server = default_server,
+      String path,
+      Map<String, String> params,
+      Map<String, String> headers = default_headers,
+      Map<String, dynamic> body,
+      Future<T> process(json)}) async {
+    var uri = Uri.https(server, path, params);
+    var response = body == null
+        ? http.get(uri, headers: headers)
+        : http.put(uri, body: jsonEncode(body), headers: headers);
 
-  Future<T> putJson<T>(String res, String id,
-      T fromJson(Map<String, dynamic> json), Map<String, dynamic> body) async {
-    http.Response response = await _insertOrUpdate(res, id, body);
-    return _parseResponse(response, fromJson);
-  }
-
-  dynamic _parseResponse(http.Response response, fromJson) {
-    print('response: $response');
-    print('response code: ${response.statusCode}');
-    print('response body: ${response.body}');
-
-    if (isOK(response)) {
-      var jsonResponse = jsonDecode(response.body);
-      //TIP no firebase, a resposta é um mapa cuja chave é 'documents'.
-      var jsonMaps = jsonResponse['documents'];
-      return jsonMaps != null ? fromJson(jsonMaps) : null;
+    var res = await response;
+    if (isOK(res)) {
+      return res.body == null ? null : process(jsonDecode(res.body));
     } else {
-      throw Exception('Falha ao carregar os dados.');
+      throw Exception('Falha ao chamar a api REST.');
     }
   }
 
-  Future<http.Response> _insertOrUpdate(
-      String res, String id, Map<String, dynamic> body) async {
-    var uri = Uri.https(_server, _path(res, id));
-    if (id == null) {
-      return http.post(uri, body: jsonEncode(body), headers: {
-        HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-      });
-    } else {
-      return http.put(uri, body: jsonEncode(body), headers: {
-        HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-      });
-    }
-  }
-
-  Future<bool> deleteJson(String res, String id) async {
-    var uri = Uri.https(_server, _path(res, id));
-    var response = await http.delete(uri, headers: {
-      HttpHeaders.contentTypeHeader: 'application/json; charset=UTF-8',
-    });
+  Future<bool> deleteJson(
+      {String server = default_server,
+      String path,
+      Map<String, String> headers = default_headers}) async {
+    var uri = Uri.https(server, path);
+    var response = await http.delete(uri, headers: headers);
     return isOK(response);
   }
 }

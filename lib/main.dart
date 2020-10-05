@@ -1,8 +1,8 @@
-import 'package:dsi_app/aluno.dart';
+import 'package:dsi_app/aluno_widgets.dart';
 import 'package:dsi_app/constants.dart';
 import 'package:dsi_app/home.dart';
 import 'package:dsi_app/login.dart';
-import 'package:dsi_app/pessoa.dart';
+import 'package:dsi_app/pessoa_widgets.dart';
 import 'package:dsi_app/register.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
