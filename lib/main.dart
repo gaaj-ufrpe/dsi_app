@@ -3,9 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(DSIApp());
-}
+void main() => runApp(DSIApp());
 
 class DSIApp extends StatelessWidget {
   @override
@@ -15,6 +13,22 @@ class DSIApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        textTheme: TextTheme(
+          bodyText2: TextStyle(color: Colors.black, fontSize: 18.0),
+          subtitle2: TextStyle(
+            color: Colors.red,
+            fontSize: 24.0,
+            fontFamily: 'Xilo',
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            primary: Colors.white,
+            backgroundColor: Colors.green,
+          ),
+        ),
       ),
       home: DSIPage(title: 'My First App - DSI/BSI/UFRPE'),
     );
@@ -52,11 +66,9 @@ class _DSIPageState extends State<DSIPage> {
     });
   }
 
-  String _getCountText() {
-    return 'Você clicou $_counter vezes no botão.';
-  }
+  String get _countText => 'Você clicou $_counter vezes no botão.';
 
-  String _getWarningText() {
+  String get _warningText {
     String result = '';
     if (_counter > 5) {
       var idx = Random().nextInt(_warnings.length);
@@ -65,7 +77,7 @@ class _DSIPageState extends State<DSIPage> {
     return result;
   }
 
-  String _getImageName() {
+  String get _imageName {
     //abra o arquivo 'pubspec.yaml' e veja as entradas na seção 'assets'.
     //para incluir novas imagens, basta incluir novas entradas nesta seção.
     String result;
@@ -98,16 +110,11 @@ class _DSIPageState extends State<DSIPage> {
         child: Center(
           child: Column(
             children: <Widget>[
-              DSIMainBodyWidget(
-                  _getCountText(), _getWarningText(), _getImageName()),
+              DSIMainBodyWidget(_countText, _warningText, _imageName),
               Spacer(),
-              FlatButton(
+              TextButton(
                 onPressed: _resetCounter,
-                color: Colors.green,
-                child: Text(
-                  'Reset',
-                  style: TextStyle(color: Colors.white, fontSize: 16.0),
-                ),
+                child: Text('Reset'),
               )
             ],
           ),
@@ -133,17 +140,13 @@ class DSIMainBodyWidget extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        Text(
-          _countText,
-          style: TextStyle(color: Colors.black, fontSize: 16.0),
-        ),
-        SizedBox(height: 8.0),
+        Text(_countText),
         if (_warningText.isNotEmpty)
           Text(
             _warningText,
-            style: TextStyle(color: Colors.red, fontSize: 24.0),
+            style: Theme.of(context).textTheme.subtitle2,
           ),
-        SizedBox(height: 8.0),
+        if (_image.isNotEmpty) SizedBox(height: 8.0),
         if (_image.isNotEmpty)
           Image(
             image: AssetImage(_image),
