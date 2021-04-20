@@ -1,158 +1,146 @@
-import 'dart:math';
-import 'dart:ui';
-
+import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(DSIApp());
+Map<WordPair, bool> wordPairs;
 
+///App baseado no tutorial do Flutter disponível em:
+///https://codelabs.developers.google.com/codelabs/first-flutter-app-pt1
 class DSIApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'DSI App',
+      title: 'App de Listagem - DSI/BSI/UFRPE',
       theme: ThemeData(
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        textTheme: TextTheme(
-          bodyText2: TextStyle(color: Colors.black, fontSize: 18.0),
-          subtitle2: TextStyle(
-            color: Colors.red,
-            fontSize: 24.0,
-            fontFamily: 'Xilo',
-            fontWeight: FontWeight.bold,
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-        textButtonTheme: TextButtonThemeData(
-          style: TextButton.styleFrom(
-            primary: Colors.white,
-            backgroundColor: Colors.green,
-          ),
-        ),
       ),
-      home: DSIPage(title: 'My First App - DSI/BSI/UFRPE'),
+      home: HomePage(),
     );
   }
 }
 
-class DSIPage extends StatefulWidget {
-  final String title;
-
-  DSIPage({Key key, this.title}) : super(key: key);
-
-  @override
-  _DSIPageState createState() => _DSIPageState();
+void main() {
+  final generatedWordPairs = generateWordPairs().take(20);
+  wordPairs =
+      Map.fromIterable(generatedWordPairs, key: (e) => e, value: (e) => null);
+  runApp(DSIApp());
 }
 
-class _DSIPageState extends State<DSIPage> {
-  final _warnings = [
-    'JÁ DEU BENÇA!',
-    'VAI QUEBRAR O CELULAR!',
-    'PARA VÉI!',
-    'QUE DEDO NERVOSO!',
-    'PRA QUE ISSO?!',
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int pageIndex = 0;
+  List<Widget> _pages = [
+    RandomWordsListPage(null),
+    RandomWordsListPage(true),
+    RandomWordsListPage(false)
   ];
-  int _counter = 0;
 
-  void _incrementCounter() {
+  void _changePage(int value) {
     setState(() {
-      _counter++;
+      pageIndex = value;
     });
-  }
-
-  void _resetCounter() {
-    setState(() {
-      _counter = 0;
-    });
-  }
-
-  String get _countText => 'Você clicou $_counter vezes no botão.';
-
-  String get _warningText {
-    String result = '';
-    if (_counter > 5) {
-      var idx = Random().nextInt(_warnings.length);
-      result = _warnings[idx];
-    }
-    return result;
-  }
-
-  String get _imageName {
-    //abra o arquivo 'pubspec.yaml' e veja as entradas na seção 'assets'.
-    //para incluir novas imagens, basta incluir novas entradas nesta seção.
-    String result;
-    if (_counter == 0) {
-      result = '';
-    } else if (_counter > 5) {
-      result = 'images/jadeu.png';
-    } else if (_counter > 2) {
-      result = 'images/thug2.gif';
-    } else {
-      result = 'images/thug1.jpg';
-    }
-    return result;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: <Widget>[
-            Text(widget.title),
-            Spacer(),
-            Image(image: AssetImage('images/logo/bsi-white.png'), height: 32),
-          ],
-        ),
+        title: Text('App de Listagem - DSI/BSI/UFRPE'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              DSIMainBodyWidget(_countText, _warningText, _imageName),
-              Spacer(),
-              TextButton(
-                onPressed: _resetCounter,
-                child: Text('Reset'),
-              )
-            ],
+      body: _pages[pageIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: _changePage,
+        currentIndex: pageIndex,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home_outlined),
+            label: 'Home',
           ),
-        ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.thumb_up_outlined),
+            label: 'Liked',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.thumb_down_outlined),
+            label: 'Disliked',
+          ),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
 
-class DSIMainBodyWidget extends StatelessWidget {
-  final String _countText;
-  final String _warningText;
-  final String _image;
-  DSIMainBodyWidget(this._countText, this._warningText, this._image);
+class RandomWordsListPage extends StatefulWidget {
+  final bool filter;
+  RandomWordsListPage(this.filter);
+
+  @override
+  _RandomWordsListPageState createState() => _RandomWordsListPageState();
+}
+
+class _RandomWordsListPageState extends State<RandomWordsListPage> {
+  final _icons = {
+    null: Icon(Icons.thumbs_up_down_outlined),
+    true: Icon(Icons.thumb_up, color: Colors.blue),
+    false: Icon(Icons.thumb_down, color: Colors.red),
+  };
+
+  Iterable<WordPair> get items {
+    if (widget.filter == null) {
+      return wordPairs.keys;
+    } else {
+      return wordPairs.entries
+          .where((element) => element.value == widget.filter)
+          .map((e) => e.key);
+    }
+  }
+
+  _toggle(WordPair wordPair) {
+    bool like = wordPairs[wordPair];
+    if (widget.filter != null) {
+      wordPairs[wordPair] = null;
+    } else if (like == null) {
+      wordPairs[wordPair] = true;
+    } else if (like == true) {
+      wordPairs[wordPair] = false;
+    } else {
+      wordPairs[wordPair] = null;
+    }
+    setState(() {});
+  }
+
+  String capitalize(String s) {
+    return '${s[0].toUpperCase()}${s.substring(1)}';
+  }
+
+  String asString(WordPair wordPair) {
+    return '${capitalize(wordPair.first)} '
+        '${capitalize(wordPair.second)}';
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Text(_countText),
-        if (_warningText.isNotEmpty)
-          Text(
-            _warningText,
-            style: Theme.of(context).textTheme.subtitle2,
-          ),
-        if (_image.isNotEmpty) SizedBox(height: 8.0),
-        if (_image.isNotEmpty)
-          Image(
-            image: AssetImage(_image),
-            height: 240,
-          ),
-      ],
+    return ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: items.length * 2,
+        itemBuilder: (BuildContext _context, int i) {
+          if (i.isOdd) {
+            return Divider();
+          }
+          final int index = i ~/ 2;
+          return _buildRow(index + 1, items.elementAt(index));
+        });
+  }
+
+  Widget _buildRow(int index, WordPair wordPair) {
+    return ListTile(
+      title: Text('$index. ${asString(wordPair)}'),
+      trailing: _icons[wordPairs[wordPair]],
+      onTap: () => _toggle(wordPair),
     );
   }
 }
