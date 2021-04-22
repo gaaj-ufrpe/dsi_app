@@ -3,6 +3,17 @@ import 'package:flutter/material.dart';
 
 Map<WordPair, bool> wordPairs;
 
+void main() {
+  initWordPairs();
+  runApp(DSIApp());
+}
+
+void initWordPairs() {
+  final generatedWordPairs = generateWordPairs().take(20);
+  wordPairs =
+      Map.fromIterable(generatedWordPairs, key: (e) => e, value: (e) => null);
+}
+
 ///App baseado no tutorial do Flutter disponível em:
 ///https://codelabs.developers.google.com/codelabs/first-flutter-app-pt1
 class DSIApp extends StatelessWidget {
@@ -17,13 +28,6 @@ class DSIApp extends StatelessWidget {
       home: HomePage(),
     );
   }
-}
-
-void main() {
-  final generatedWordPairs = generateWordPairs().take(20);
-  wordPairs =
-      Map.fromIterable(generatedWordPairs, key: (e) => e, value: (e) => null);
-  runApp(DSIApp());
 }
 
 class HomePage extends StatefulWidget {
@@ -75,13 +79,15 @@ class _HomePageState extends State<HomePage> {
 }
 
 class RandomWordsListPage extends StatefulWidget {
-  final bool filter;
-  RandomWordsListPage(this.filter);
+  final bool _filter;
+  RandomWordsListPage(this._filter);
 
   @override
   _RandomWordsListPageState createState() => _RandomWordsListPageState();
 }
 
+///Esta classe é o estado da classe que lista os pares de palavra
+///
 class _RandomWordsListPageState extends State<RandomWordsListPage> {
   final _icons = {
     null: Icon(Icons.thumbs_up_down_outlined),
@@ -90,18 +96,19 @@ class _RandomWordsListPageState extends State<RandomWordsListPage> {
   };
 
   Iterable<WordPair> get items {
-    if (widget.filter == null) {
+    if (widget._filter == null) {
       return wordPairs.keys;
     } else {
+      //a linah aabaixo retorna os pares filtras opelo filtro
       return wordPairs.entries
-          .where((element) => element.value == widget.filter)
+          .where((element) => element.value == widget._filter)
           .map((e) => e.key);
     }
   }
 
   _toggle(WordPair wordPair) {
     bool like = wordPairs[wordPair];
-    if (widget.filter != null) {
+    if (widget._filter != null) {
       wordPairs[wordPair] = null;
     } else if (like == null) {
       wordPairs[wordPair] = true;
@@ -118,8 +125,7 @@ class _RandomWordsListPageState extends State<RandomWordsListPage> {
   }
 
   String asString(WordPair wordPair) {
-    return '${capitalize(wordPair.first)} '
-        '${capitalize(wordPair.second)}';
+    return '${capitalize(wordPair.first)} ${capitalize(wordPair.second)}';
   }
 
   @override
