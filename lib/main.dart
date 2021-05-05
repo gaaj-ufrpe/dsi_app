@@ -1,25 +1,33 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 
-Map<WordPair, bool> wordPairs = Map<WordPair, bool>();
-
 void main() {
   initWordPairs();
   runApp(DSIApp());
 }
 
+void initWordPairs() {
+  var generatedWordPairs = generateWordPairs().take(20);
+  for (WordPair wordPair in generatedWordPairs) {
+    WordPair newWordPair = createCapitalizedWord(wordPair);
+    wordPairs.putIfAbsent(newWordPair, () => null);
+  }
+}
+
+WordPair createCapitalizedWord(WordPair wordPair) {
+  var first = capitalize(wordPair.first);
+  var second = capitalize(wordPair.second);
+  return WordPair(first, second);
+}
+
+Map<WordPair, bool> wordPairs = Map<WordPair, bool>();
+
 String capitalize(String s) {
   return '${s[0].toUpperCase()}${s.substring(1)}';
 }
 
-void initWordPairs() {
-  var generatedWordPairs = generateWordPairs().take(20);
-  for (WordPair wordPair in generatedWordPairs) {
-    var first = capitalize(wordPair.first);
-    var second = capitalize(wordPair.second);
-    WordPair newWordPair = WordPair(first, second);
-    wordPairs.putIfAbsent(newWordPair, () => null);
-  }
+String asString(WordPair wordPair) {
+  return '${wordPair.first} ${wordPair.second}';
 }
 
 ///App baseado no tutorial do Flutter disponível em:
@@ -134,7 +142,7 @@ class _WordPairListPageState extends State<WordPairListPage> {
     return result;
   }
 
-  _toggle(WordPair wordPair) {
+  _toggleFavourite(WordPair wordPair) {
     bool like = wordPairs[wordPair];
     if (widget._filter != null) {
       wordPairs[wordPair] = null;
@@ -146,10 +154,6 @@ class _WordPairListPageState extends State<WordPairListPage> {
       wordPairs[wordPair] = null;
     }
     setState(() {});
-  }
-
-  String asString(WordPair wordPair) {
-    return '${wordPair.first} ${wordPair.second}';
   }
 
   @override
@@ -170,7 +174,7 @@ class _WordPairListPageState extends State<WordPairListPage> {
     return ListTile(
       title: Text('$index. ${asString(wordPair)}'),
       trailing: TextButton(
-        onPressed: () => _toggle(wordPair),
+        onPressed: () => _toggleFavourite(wordPair),
         child: _icons[wordPairs[wordPair]],
       ),
       onTap: () => Navigator.pushNamed(context, WordPairUpdatePage.routeName,
@@ -236,14 +240,14 @@ class _WordPairUpdatePageState extends State<WordPairUpdatePage> {
           ),
           ElevatedButton(
             child: Text('Salvar'),
-            onPressed: () => _salvar(context),
+            onPressed: () => _save(context),
           ),
         ],
       ),
     );
   }
 
-  void _salvar(BuildContext context) {
+  void _save(BuildContext context) {
     if (!_formKey.currentState.validate()) return;
     setState(() {
       _formKey.currentState.save();
