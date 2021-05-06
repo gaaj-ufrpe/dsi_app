@@ -153,19 +153,38 @@ class _WordPairListPageState extends State<WordPairListPage> {
     false: Icon(Icons.thumb_down, color: Colors.red),
   };
 
-  ///Método getter para retornar os itens.
+  ///Compara dois pares de palavras.
+  ///Retorna:
+  ///-1 se [a] for menor que [b];
+  ///0 se [a] for igual [b];
+  ///1 se [a] for maior que [b];
+  int compareWordPairs(WordPair a, WordPair b) {
+    int result = a.first.compareTo(b.first);
+    if (result == 0) {
+      result = a.second.compareTo(b.second);
+    }
+    return result;
+  }
+
+  ///Método getter para retornar os itens. Os itens são ordenados utilizando o
+  ///método [compareWordPairs].
+  ///
   ///Dependendo do que está setado no atributo [widget._filter], este método
   ///retorna todas as palavras, as palavras curtidas ou as palavras não curtidas.
   ///Veja:
   /// https://dart.dev/guides/language/language-tour#getters-and-setters
   Iterable<WordPair> get items {
+    List<WordPair> result;
     if (widget._filter == null) {
-      return wordPairs.keys;
+      result = wordPairs.keys.toList();
     } else {
-      return wordPairs.entries
+      result = wordPairs.entries
           .where((element) => element.value == widget._filter)
-          .map((e) => e.key);
+          .map((e) => e.key)
+          .toList();
     }
+    result.sort(compareWordPairs);
+    return result;
   }
 
   ///Altera o estado de curtida da palavra.
