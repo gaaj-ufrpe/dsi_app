@@ -1,22 +1,46 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 
-///Mapa que armazena o par de palavras ([WordPair]) na chave e um [bool] no
-///valor, indicando se o usuário curtiu ([true]), não curtiu ([false]) ou ficou
-///indiferente ([null]) ao par de palavras.
-Map<WordPair, bool> wordPairs;
+///Lista de pares de palavras ([DSIWordPair]) .
+List<DSIWordPair> wordPairs;
 
 /// Função que deixa uma string com a primeira letra maiúscula.
 String capitalize(String s) {
   return '${s[0].toUpperCase()}${s.substring(1)}';
 }
 
-/// Função que converte um objeto da classe [WordPair] para uma [String].
-String asString(WordPair wordPair) {
-  return '${capitalize(wordPair.first)} ${capitalize(wordPair.second)}';
+///Esta classe é uma implementação própria do [WordPair], incluindo outros
+///atributos e métodos necessários para o App.
+class DSIWordPair extends Comparable<DSIWordPair> {
+  String first, second;
+  bool favourite;
+  DSIWordPair() {
+    WordPair wordPair = WordPair.random();
+    this.first = capitalize(wordPair.first);
+    this.second = capitalize(wordPair.second);
+  }
+
+  @override
+  String toString() {
+    return '${this.first} ${this.second}';
+  }
+
+  ///Compara dois pares de palavras.
+  ///Retorna:
+  ///-1 se [a] for menor que [b];
+  ///0 se [a] for igual [b];
+  ///1 se [a] for maior que [b];
+  @override
+  int compareTo(DSIWordPair that) {
+    int result = this.first.compareTo(that.first);
+    if (result == 0) {
+      result = this.second.compareTo(that.second);
+    }
+    return result;
+  }
 }
 
-///TPC-3:
+///TPC-2 (branch_wordPairs1):
 ///Este app foi baseado no tutorial do Flutter disponível em:
 ///https://codelabs.developers.google.com/codelabs/first-flutter-app-pt1
 ///
@@ -37,21 +61,25 @@ String asString(WordPair wordPair) {
 /// Este código também inclui um getter para os itens deste mapa (vide [items]).
 /// Para maiores informações acesse:
 /// https://dart.dev/guides/language/language-tour#getters-and-setters
+///
+///TPC-3 (branch_wordPairs2):
+/// Este app foi ajustado para usar uma classe própria ([DSIWordPair]), ao invés
+/// de usar o [WordPair] diretamente. Assim, novos atributos podem ser
+/// adicionados na classe. Assim, ao invés de utilizar o Map para armazenar
+/// a informação da curtida, esta informação fica em um atributo da própria
+/// classe.
 void main() {
   initWordPairs();
   runApp(DSIApp());
 }
 
-///Inicializa o mapa com os pares de palavras.
+///Inicializa a lista com os pares de palavras.
 void initWordPairs() {
-  wordPairs = Map<WordPair, bool>();
-  final generatedWordPairs = generateWordPairs().take(20);
-  for (WordPair wordPair in generatedWordPairs) {
-    var first = capitalize(wordPair.first);
-    var second = capitalize(wordPair.second);
-    var key = WordPair(first, second);
-    wordPairs.putIfAbsent(key, () => null);
+  wordPairs = <DSIWordPair>[];
+  for (var i = 0; i < 20; i++) {
+    wordPairs.add(DSIWordPair());
   }
+  wordPairs.sort();
 }
 
 ///Classe principal que representa o App.
@@ -153,49 +181,36 @@ class _WordPairListPageState extends State<WordPairListPage> {
     false: Icon(Icons.thumb_down, color: Colors.red),
   };
 
-  ///Compara dois pares de palavras.
-  ///Retorna:
-  ///-1 se [a] for menor que [b];
-  ///0 se [a] for igual [b];
-  ///1 se [a] for maior que [b];
-  int compareWordPairs(WordPair a, WordPair b) {
-    int result = a.first.compareTo(b.first);
-    if (result == 0) {
-      result = a.second.compareTo(b.second);
-    }
-    return result;
-  }
-
-  ///Método getter para retornar os itens.
+  ///Método getter para retornar os itens. Os itens são ordenados utilizando a
+  ///ordenação definida na classe [DSIWordPair].
+  ///
   ///Dependendo do que está setado no atributo [widget._filter], este método
   ///retorna todas as palavras, as palavras curtidas ou as palavras não curtidas.
   ///Veja:
   /// https://dart.dev/guides/language/language-tour#getters-and-setters
-  Iterable<WordPair> get items {
-    List<WordPair> result;
+  Iterable<DSIWordPair> get items {
+    List<DSIWordPair> result;
     if (widget._filter == null) {
-      result = wordPairs.keys.toList();
+      result = wordPairs;
     } else {
-      result = wordPairs.entries
-          .where((element) => element.value == widget._filter)
-          .map((e) => e.key)
+      result = wordPairs
+          .where((element) => element.favourite == widget._filter)
           .toList();
     }
-    result.sort(compareWordPairs);
     return result;
   }
 
   ///Altera o estado de curtida da palavra.
-  _toggleFavourite(WordPair wordPair) {
-    bool like = wordPairs[wordPair];
+  _toggleFavourite(DSIWordPair wordPair) {
+    bool like = wordPair.favourite;
     if (widget._filter != null) {
-      wordPairs[wordPair] = null;
+      wordPair.favourite = null;
     } else if (like == null) {
-      wordPairs[wordPair] = true;
+      wordPair.favourite = true;
     } else if (like == true) {
-      wordPairs[wordPair] = false;
+      wordPair.favourite = false;
     } else {
-      wordPairs[wordPair] = null;
+      wordPair.favourite = null;
     }
     setState(() {});
   }
@@ -218,18 +233,18 @@ class _WordPairListPageState extends State<WordPairListPage> {
   }
 
   ///Constroi uma linha da listagem a partir do par de palavras e do índice.
-  Widget _buildRow(BuildContext context, int index, WordPair wordPair) {
+  Widget _buildRow(BuildContext context, int index, DSIWordPair wordPair) {
     return ListTile(
-      title: Text('$index. ${asString(wordPair)}'),
+      title: Text('$index. ${wordPair}'),
       trailing: TextButton(
         onPressed: () => _toggleFavourite(wordPair),
-        child: _icons[wordPairs[wordPair]],
+        child: _icons[wordPair.favourite],
       ),
       onTap: () => _updateWordPair(context, wordPair),
     );
   }
 
-  _updateWordPair(BuildContext context, WordPair wordPair) {
+  _updateWordPair(BuildContext context, DSIWordPair wordPair) {
     final snackBar = SnackBar(
       content: Text('Não foi implementado ainda.'),
       action: SnackBarAction(
