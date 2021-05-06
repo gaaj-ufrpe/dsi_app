@@ -1,21 +1,6 @@
 import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 
-///Mapa que armazena o par de palavras ([WordPair]) na chave e um [bool] no
-///valor, indicando se o usuário curtiu ([true]), não curtiu ([false]) ou ficou
-///indiferente ([null]) ao par de palavras.
-Map<WordPair, bool> wordPairs;
-
-/// Função que deixa uma string com a primeira letra maiúscula.
-String capitalize(String s) {
-  return '${s[0].toUpperCase()}${s.substring(1)}';
-}
-
-/// Função que converte um objeto da classe [WordPair] para uma [String].
-String asString(WordPair wordPair) {
-  return '${capitalize(wordPair.first)} ${capitalize(wordPair.second)}';
-}
-
 ///TPC-2 (branch_wordPairs1):
 ///Este app foi baseado no tutorial do Flutter disponível em:
 ///https://codelabs.developers.google.com/codelabs/first-flutter-app-pt1
@@ -52,6 +37,21 @@ void initWordPairs() {
     var key = WordPair(first, second);
     wordPairs.putIfAbsent(key, () => null);
   }
+}
+
+///Mapa que armazena o par de palavras ([WordPair]) na chave e um [bool] no
+///valor, indicando se o usuário curtiu ([true]), não curtiu ([false]) ou ficou
+///indiferente ([null]) ao par de palavras.
+Map<WordPair, bool> wordPairs;
+
+/// Função que deixa uma string com a primeira letra maiúscula.
+String capitalize(String s) {
+  return '${s[0].toUpperCase()}${s.substring(1)}';
+}
+
+/// Função que converte um objeto da classe [WordPair] para uma [String].
+String asString(WordPair wordPair) {
+  return '${capitalize(wordPair.first)} ${capitalize(wordPair.second)}';
 }
 
 ///Classe principal que representa o App.
