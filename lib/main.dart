@@ -72,7 +72,6 @@ class DSIApp extends StatelessWidget {
 ///Página inicial que apresenta o [BottomNavigationBar], onde cada
 ///[BottomNavigationBarItem] é uma página do tipo [WordPairListPage].
 class HomePage extends StatefulWidget {
-  static const routeName = '/';
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -112,7 +111,7 @@ class _HomePageState extends State<HomePage> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),
-            label: 'Home',
+            label: 'Todas',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.thumb_up_outlined),
@@ -130,9 +129,6 @@ class _HomePageState extends State<HomePage> {
 
 ///Página que apresenta a listagem de palavras.
 class WordPairListPage extends StatefulWidget {
-  ///Nome da rota que leva a esta página.
-  static const routeName = '/wordpair/list';
-
   ///atributo que determina as palavras que serão exibidas na listagem.
   ///
   ///[null]: todas as palavras.
