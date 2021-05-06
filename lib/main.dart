@@ -6,6 +6,37 @@ import 'package:flutter/material.dart';
 ///indiferente ([null]) ao par de palavras.
 Map<WordPair, bool> wordPairs;
 
+/// Função que deixa uma string com a primeira letra maiúscula.
+String capitalize(String s) {
+  return '${s[0].toUpperCase()}${s.substring(1)}';
+}
+
+/// Função que converte um objeto da classe [WordPair] para uma [String].
+String asString(WordPair wordPair) {
+  return '${capitalize(wordPair.first)} ${capitalize(wordPair.second)}';
+}
+
+///TPC-3:
+///Este app foi baseado no tutorial do Flutter disponível em:
+///https://codelabs.developers.google.com/codelabs/first-flutter-app-pt1
+///
+/// Ele foi adaptado para utilizar o [BottomNavigationBar] exibindo listagens de
+/// palavras que o usuário gosta e desgosta. Para armazenar se o usuário gostou,
+/// desgostou, ou simplesmente não fez nada com a palavra, este app utiliza um
+/// [Map] denominado [wordPairs]. Este mapa, equivalente ao dicionário do Python,
+/// armazena o par de palavras como chave e um valor do tipo [bool], indicando
+/// se o usuário gostou ou desgostou da palavra. Caso seja null, indica que o
+/// usuário não gostou nem desgostou da palavra.
+///
+/// Vale frisar, que este mapa foi criado usando Generics. Assim, caso o
+/// programador tente colocar uma chave diferente do tipo [WordPair] ou um valor
+/// que não seja do tipo [bool], ocorrerá um erro de compilação.
+/// Para maiores informações, acesse:
+/// https://dart.dev/guides/language/language-tour#generics
+///
+/// Este código também inclui um getter para os itens deste mapa (vide [items]).
+/// Para maiores informações acesse:
+/// https://dart.dev/guides/language/language-tour#getters-and-setters
 void main() {
   initWordPairs();
   runApp(DSIApp());
@@ -34,15 +65,7 @@ class DSIApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: HomePage(),
-      initialRoute: HomePage.routeName,
-      routes: _buildRoutes(context),
     );
-  }
-
-  Map<String, WidgetBuilder> _buildRoutes(BuildContext context) {
-    return {
-      WordPairUpdatePage.routeName: (context) => WordPairUpdatePage(),
-    };
   }
 }
 
@@ -203,39 +226,23 @@ class _WordPairListPageState extends State<WordPairListPage> {
     return ListTile(
       title: Text('$index. ${asString(wordPair)}'),
       trailing: TextButton(
-        onPressed: () => _toggle(wordPair),
+        onPressed: () => _toggleFavourite(wordPair),
         child: _icons[wordPairs[wordPair]],
       ),
-      onTap: () => Navigator.pushNamed(context, WordPairUpdatePage.routeName,
-          arguments: wordPair),
+      onTap: () => _updateWordPair(context, wordPair),
     );
   }
-}
 
-class WordPairUpdatePage extends StatefulWidget {
-  static const routeName = '/wordpair/update';
-
-  WordPairUpdatePage();
-
-  @override
-  _WordPairUpdatePageState createState() => _WordPairUpdatePageState();
-}
-
-///Esta classe é o estado da classe que atualiza os pares de palavras.
-class _WordPairUpdatePageState extends State<WordPairUpdatePage> {
-  final _formKey = GlobalKey<FormState>();
-  WordPair _wordPair;
-  String _newFirst;
-  String _newSecond;
-
-  @override
-  Widget build(BuildContext context) {
-    _wordPair = ModalRoute.of(context).settings.arguments;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('App de Listagem - DSI/BSI/UFRPE'),
+  _updateWordPair(BuildContext context, WordPair wordPair) {
+    final snackBar = SnackBar(
+      content: Text('Não foi implementado ainda.'),
+      action: SnackBarAction(
+        label: 'OK',
+        onPressed: () {
+          // Some code to undo the change.
+        },
       ),
-      body: _buildForm(context),
     );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
