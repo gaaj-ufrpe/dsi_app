@@ -59,7 +59,7 @@ class DSIApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'App de Listagem - DSI/BSI/UFRPE',
+      title: 'DSI App (BSI UFRPE)',
       theme: ThemeData(
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
