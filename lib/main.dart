@@ -130,7 +130,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('App de Listagem - DSI/BSI/UFRPE'),
+        title: Text('DSI App (BSI UFRPE)'),
       ),
       body: _pages[_pageIndex],
       bottomNavigationBar: BottomNavigationBar(
