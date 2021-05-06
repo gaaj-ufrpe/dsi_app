@@ -16,7 +16,7 @@ String asString(WordPair wordPair) {
   return '${capitalize(wordPair.first)} ${capitalize(wordPair.second)}';
 }
 
-///TPC-2:
+///TPC-2 (branch_wordPairs1):
 ///Este app foi baseado no tutorial do Flutter disponível em:
 ///https://codelabs.developers.google.com/codelabs/first-flutter-app-pt1
 ///
@@ -153,21 +153,7 @@ class _WordPairListPageState extends State<WordPairListPage> {
     false: Icon(Icons.thumb_down, color: Colors.red),
   };
 
-  ///Compara dois pares de palavras.
-  ///Retorna:
-  ///-1 se [a] for menor que [b];
-  ///0 se [a] for igual [b];
-  ///1 se [a] for maior que [b];
-  int compareWordPairs(WordPair a, WordPair b) {
-    int result = a.first.compareTo(b.first);
-    if (result == 0) {
-      result = a.second.compareTo(b.second);
-    }
-    return result;
-  }
-
-  ///Método getter para retornar os itens. Os itens são ordenados utilizando o
-  ///método [compareWordPairs].
+  ///Método getter para retornar os itens.
   ///
   ///Dependendo do que está setado no atributo [widget._filter], este método
   ///retorna todas as palavras, as palavras curtidas ou as palavras não curtidas.
@@ -183,7 +169,6 @@ class _WordPairListPageState extends State<WordPairListPage> {
           .map((e) => e.key)
           .toList();
     }
-    result.sort(compareWordPairs);
     return result;
   }
 
