@@ -296,7 +296,7 @@ class _WordPairUpdatePageState extends State<WordPairUpdatePage> {
     _wordPair = ModalRoute.of(context).settings.arguments;
     return Scaffold(
       appBar: AppBar(
-        title: Text('App de Listagem - DSI/BSI/UFRPE'),
+        title: Text('DSI App (BSI UFRPE)'),
       ),
       body: _buildForm(context),
     );
