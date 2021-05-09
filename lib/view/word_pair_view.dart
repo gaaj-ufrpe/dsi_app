@@ -60,6 +60,12 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () =>
+            Navigator.pushNamed(context, WordPairUpdatePage.routeName),
+        tooltip: 'Add',
+        child: Icon(Icons.add),
+      ), // This trailing comma ,
     );
   }
 }
@@ -186,6 +192,9 @@ class _WordPairUpdatePageState extends State<WordPairUpdatePage> {
   @override
   Widget build(BuildContext context) {
     _wordPair = ModalRoute.of(context).settings.arguments;
+    if (_wordPair == null) {
+      _wordPair = DSIWordPair();
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text('DSI App (BSI UFRPE)'),
