@@ -48,4 +48,19 @@ class DSIWordPair extends Comparable<DSIWordPair> {
     }
     return result;
   }
+
+  ///Converte um objeto JSON para um objeto do tipo [DSIWordPair].
+  DSIWordPair.fromJson(Map<String, dynamic> json) {
+    if (json == null) return;
+    first = json['first'];
+    second = json['second'];
+    favourite = json['favourite'];
+  }
+
+  ///Converte o objeto atual para um objeto JSON.
+  Map<String, dynamic> toJson() => {
+        'first': first,
+        'second': second,
+        'favourite': favourite,
+      };
 }
