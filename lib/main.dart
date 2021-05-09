@@ -36,6 +36,9 @@ import 'package:flutter/material.dart';
 /// anterior. Já o segundo, compara um objeto da classe com outro, permitindo
 /// o conceito de ordenamento, utilizado no método [List#sort].
 ///
+/// Esta atualização também ajusta a linha da listagem para diferenciar o botão
+/// de curtida e a linha.
+///
 ///TPC-3 (branch_wordPairs3):
 /// Esta atualização inclui a parte de rotas, que permite navegar entre as telas
 /// em um App Flutter. Além disso, é criada a tela de atualização do par de palavras.
@@ -65,14 +68,25 @@ String capitalize(String s) {
 ///Esta classe é uma implementação própria do [WordPair], incluindo outros
 ///atributos e métodos necessários para o App.
 class DSIWordPair extends Comparable<DSIWordPair> {
-  String first, second;
+  ///A primeira palavra do par.
+  String first;
+
+  ///A segunda palavra do par.
+  String second;
+
+  ///Booleano que pode ser [null], indicando se o par de palavras é
+  ///favoritado ou não.
   bool favourite;
+
+  ///Construtor da classe
   DSIWordPair() {
     WordPair wordPair = WordPair.random();
     this.first = capitalize(wordPair.first);
     this.second = capitalize(wordPair.second);
   }
 
+  ///Este método foi sobrescrito para customizar a conversão de um objeto desta
+  ///calsse para String
   @override
   String toString() {
     return '${this.first} ${this.second}';
@@ -121,7 +135,10 @@ class DSIApp extends StatelessWidget {
 ///Página inicial que apresenta o [BottomNavigationBar], onde cada
 ///[BottomNavigationBarItem] é uma página do tipo [WordPairListPage].
 class HomePage extends StatefulWidget {
+  ///Nome da rota referente à página Home.
   static const routeName = '/';
+
+  ///Cria o estado da página Home.
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -203,6 +220,15 @@ class _WordPairListPageState extends State<WordPairListPage> {
     false: Icon(Icons.thumb_down, color: Colors.red),
   };
 
+  ///Este método é sobrescrito para atualizar a ordem da lista, sempre que a
+  ///tela for exibida. A inicialização dos atributos do estado sempre devem
+  ///ser feitas no método [initState] do Flutter.
+  @override
+  void initState() {
+    super.initState();
+    wordPairs.sort();
+  }
+
   ///Método getter para retornar os itens. Os itens são ordenados utilizando a
   ///ordenação definida na classe [DSIWordPair].
   ///
@@ -277,8 +303,10 @@ class _WordPairListPageState extends State<WordPairListPage> {
 class WordPairUpdatePage extends StatefulWidget {
   static const routeName = '/wordpair/update';
 
+  ///Construtor da classe
   WordPairUpdatePage();
 
+  ///Cria o estado da página de atualização de palavras.
   @override
   _WordPairUpdatePageState createState() => _WordPairUpdatePageState();
 }
@@ -347,7 +375,7 @@ class _WordPairUpdatePageState extends State<WordPairUpdatePage> {
       _formKey.currentState.save();
       _updateWordPair();
     });
-    Navigator.popAndPushNamed(context, HomePage.routeName);
+    Navigator.pop(context, HomePage.routeName);
   }
 
   ///Recupera os dados que os campos de texto atualizaram nos atributos da classe
