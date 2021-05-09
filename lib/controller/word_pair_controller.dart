@@ -48,7 +48,6 @@ class DSIWordPairController {
   ///a condição representada pela função passada como parâmetro. Caso a função
   ///passada seja [null], retorna todos os elementos.
   List<DSIWordPair> getByFilter(bool test(DSIWordPair element)) {
-    print("getByFilter: $test");
     List<DSIWordPair> result = _wordPairs;
     if (test != null) {
       result = _wordPairs.where(test).toList();
