@@ -35,6 +35,9 @@ import 'package:flutter/material.dart';
 /// uma string (evitando a necessidade da função [asString] criada no tópico
 /// anterior. Já o segundo, compara um objeto da classe com outro, permitindo
 /// o conceito de ordenamento, utilizado no método [List#sort].
+///
+/// Esta atualização também ajusta a linha da listagem para diferenciar o botão
+/// de curtida e a linha.
 void main() {
   initWordPairs();
   runApp(DSIApp());
@@ -60,14 +63,25 @@ String capitalize(String s) {
 ///Esta classe é uma implementação própria do [WordPair], incluindo outros
 ///atributos e métodos necessários para o App.
 class DSIWordPair extends Comparable<DSIWordPair> {
-  String first, second;
+  ///A primeira palavra do par.
+  String first;
+
+  ///A segunda palavra do par.
+  String second;
+
+  ///Booleano que pode ser [null], indicando se o par de palavras é
+  ///favoritado ou não.
   bool favourite;
+
+  ///Construtor da classe
   DSIWordPair() {
     WordPair wordPair = WordPair.random();
     this.first = capitalize(wordPair.first);
     this.second = capitalize(wordPair.second);
   }
 
+  ///Este método foi sobrescrito para customizar a conversão de um objeto desta
+  ///calsse para String
   @override
   String toString() {
     return '${this.first} ${this.second}';
@@ -90,10 +104,11 @@ class DSIWordPair extends Comparable<DSIWordPair> {
 
 ///Classe principal que representa o App.
 class DSIApp extends StatelessWidget {
+  ///Constrói o App e suas configurações.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'App de Listagem - DSI/BSI/UFRPE',
+      title: 'DSI App (BSI UFRPE)',
       theme: ThemeData(
         primarySwatch: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -106,6 +121,7 @@ class DSIApp extends StatelessWidget {
 ///Página inicial que apresenta o [BottomNavigationBar], onde cada
 ///[BottomNavigationBarItem] é uma página do tipo [WordPairListPage].
 class HomePage extends StatefulWidget {
+  ///Cria o estado da página Home.
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -250,6 +266,7 @@ class _WordPairListPageState extends State<WordPairListPage> {
     );
   }
 
+  ///Exibe a tela de atualização do par de palavras.
   _updateWordPair(BuildContext context, DSIWordPair wordPair) {
     final snackBar = SnackBar(
       content: Text('Não foi implementado ainda.'),
