@@ -42,9 +42,9 @@ class DSIWordPair extends Comparable<DSIWordPair> {
   ///1 se [a] for maior que [b];
   @override
   int compareTo(DSIWordPair that) {
-    int result = this.first.compareTo(that.first);
+    int result = this.first.toLowerCase().compareTo(that.first.toLowerCase());
     if (result == 0) {
-      result = this.second.compareTo(that.second);
+      result = this.second.toLowerCase().compareTo(that.second.toLowerCase());
     }
     return result;
   }

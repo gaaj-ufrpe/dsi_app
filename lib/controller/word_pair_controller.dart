@@ -1,13 +1,13 @@
 import 'package:dsi_app/model/word_pair_model.dart';
 
-///Atributo que armazena o último id.
+///Armazena o próximo id.
 int _nextWordPairId = 1;
+
+///Lista de pares de palavras ([DSIWordPair]).
+List<DSIWordPair> _wordPairs;
 
 ///Controlador do módulo de pares de palavras.
 class DSIWordPairController {
-  ///Lista de pares de palavras ([DSIWordPair]) .
-  List<DSIWordPair> _wordPairs;
-
   ///Construtor da classe.
   DSIWordPairController() {
     _initWordPairs();
@@ -15,6 +15,8 @@ class DSIWordPairController {
 
   ///Inicializa a lista com os pares de palavras.
   void _initWordPairs() {
+    if (_wordPairs != null) return;
+
     _wordPairs = <DSIWordPair>[];
     for (var i = 0; i < 20; i++) {
       DSIWordPair wordPair = DSIWordPair();

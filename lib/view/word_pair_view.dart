@@ -84,7 +84,6 @@ class WordPairListPage extends StatefulWidget {
 ///Esta classe é o estado da classe [WordPairListPage].
 class _WordPairListPageState extends State<WordPairListPage> {
   final DSIWordPairController _controller = DSIWordPairController();
-  List<DSIWordPair> _wordPairs;
 
   ///Map com os ícones utilizados no [BottomNavigationBar].
   final _icons = {
@@ -93,29 +92,22 @@ class _WordPairListPageState extends State<WordPairListPage> {
     false: Icon(Icons.thumb_down, color: Colors.red),
   };
 
-  _WordPairListPageState() {
-    _initWordPairs();
-  }
-
-  ///Este método é sobrescrito para atualizar a ordem da lista, sempre que a
-  ///tela for exibida. A inicialização dos atributos do estado sempre devem
-  ///ser feitas no método [initState] do Flutter.
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  ///Método utilizado para inicializar o atributo com os pares de palavras do
-  ///Widget. Estes pares são recuperados a partir do controlador.
-  void _initWordPairs() {
+  ///Método getter para retornar os itens. Os itens são ordenados utilizando a
+  ///ordenação definida na classe [DSIWordPair].
+  ///
+  ///Dependendo do que está setado no atributo [widget._filter], este método
+  ///retorna todas as palavras, as palavras curtidas ou as palavras não curtidas.
+  ///Veja:
+  /// https://dart.dev/guides/language/language-tour#getters-and-setters
+  Iterable<DSIWordPair> get items {
+    List<DSIWordPair> result;
     if (widget._filter == null) {
-      print('_initWordPairs: 1');
-      _wordPairs = _controller.getAll();
+      result = _controller.getAll();
     } else {
-      print('_initWordPairs: 2');
-      _wordPairs = _controller
+      result = _controller
           .getByFilter((element) => element.favourite == widget._filter);
     }
+    return result;
   }
 
   ///Altera o estado de curtida da palavra.
@@ -141,13 +133,13 @@ class _WordPairListPageState extends State<WordPairListPage> {
   Widget build(BuildContext context) {
     return ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: _wordPairs.length * 2,
+        itemCount: items.length * 2,
         itemBuilder: (BuildContext _context, int i) {
           if (i.isOdd) {
             return Divider();
           }
           final int index = i ~/ 2;
-          return _buildRow(context, index + 1, _wordPairs.elementAt(index));
+          return _buildRow(context, index + 1, items.elementAt(index));
         });
   }
 
@@ -185,6 +177,7 @@ class WordPairUpdatePage extends StatefulWidget {
 ///Esta classe é o estado da classe que atualiza os pares de palavras.
 class _WordPairUpdatePageState extends State<WordPairUpdatePage> {
   final _formKey = GlobalKey<FormState>();
+  DSIWordPairController _controller = DSIWordPairController();
   DSIWordPair _wordPair;
   String _newFirst;
   String _newSecond;
@@ -246,7 +239,14 @@ class _WordPairUpdatePageState extends State<WordPairUpdatePage> {
       _formKey.currentState.save();
       _updateWordPair();
     });
-    Navigator.pop(context, HomePage.routeName);
+
+    //retorna para a home  e remove o histórico de navegação para evitar a
+    // exibição do botão de 'back' na appbar.
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      HomePage.routeName,
+      (Route<dynamic> route) => false,
+    );
   }
 
   ///Recupera os dados que os campos de texto atualizaram nos atributos da classe
@@ -254,5 +254,6 @@ class _WordPairUpdatePageState extends State<WordPairUpdatePage> {
   void _updateWordPair() {
     _wordPair.first = _newFirst;
     _wordPair.second = _newSecond;
+    _controller.save(_wordPair);
   }
 }
