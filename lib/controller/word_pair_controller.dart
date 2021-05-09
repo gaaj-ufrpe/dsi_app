@@ -59,7 +59,9 @@ class DSIWordPairController {
   ///Atualiza ou insere o par de palavras.
   ///A atualização ocorre caso o par de palavras possua um [id] setado.
   void save(DSIWordPair wordPair) {
-    if (wordPair.id != null) {
+    if (wordPair.id == null) {
+      wordPair.id = _nextWordPairId++;
+    } else {
       DSIWordPair oldWordPair = getById(wordPair.id);
       delete(oldWordPair);
     }
