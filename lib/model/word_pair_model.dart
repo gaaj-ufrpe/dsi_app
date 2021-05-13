@@ -4,7 +4,7 @@ import 'package:english_words/english_words.dart';
 ///atributos e métodos necessários para o App.
 class DSIWordPair extends Comparable<DSIWordPair> {
   ///O identificador do objeto.
-  int id;
+  String id;
 
   ///A primeira palavra do par.
   String first;

@@ -1,13 +1,12 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dsi_app/model/word_pair_model.dart';
-
-///Armazena o próximo id.
-int _nextWordPairId = 1;
-
-///Lista de pares de palavras ([DSIWordPair]).
-List<DSIWordPair> _wordPairs;
 
 ///Controlador do módulo de pares de palavras.
 class DSIWordPairController {
+  CollectionReference<Map<String, dynamic>> _wordPairs;
+
   ///Construtor da classe.
   DSIWordPairController() {
     _initWordPairs();
@@ -15,63 +14,57 @@ class DSIWordPairController {
 
   ///Inicializa a lista com os pares de palavras.
   void _initWordPairs() {
-    if (_wordPairs != null) return;
+    _wordPairs = FirebaseFirestore.instance.collection('wordpairs');
+  }
 
-    _wordPairs = <DSIWordPair>[];
-    for (var i = 0; i < 20; i++) {
-      DSIWordPair wordPair = DSIWordPair();
-      wordPair.id = _nextWordPairId++;
-      _wordPairs.add(wordPair);
-    }
-    _wordPairs.sort();
+  ///Cria um par de palavras a partir do snapshot do documento.
+  DSIWordPair _createWordPair(DocumentSnapshot<Map<String, dynamic>> e) {
+    DSIWordPair result = DSIWordPair.fromJson(e.data());
+    result.id = e.id;
+    return result;
   }
 
   ///Retorna uma lista com todos os pares de palavras cadastrados.
   ///Esta lista não pode ser modificada. Ou seja, não é possível inserir ou
   ///remover elementos diretamente na lista.
-  List<DSIWordPair> getAll() {
-    return List.unmodifiable(_wordPairs);
+  Future<Iterable<DSIWordPair>> getAll() async {
+    QuerySnapshot<Map<String, dynamic>> snapshot = await _wordPairs.get();
+    return snapshot.docs.map((e) => _createWordPair(e));
   }
 
   ///Retorna o par de palavras pelo [id], ou [null] caso não exista nenhum par
   ///com o [id] informado.
-  DSIWordPair getById(int id) {
+  Future<DSIWordPair> getById(String id) async {
     if (id == null) return null;
 
-    for (var wp in _wordPairs) {
-      if (wp.id == id) return wp;
-    }
-    return null;
+    DocumentSnapshot doc = await _wordPairs.doc(id).get();
+    return _createWordPair(doc);
   }
 
   ///Retorna uma lista de pares de palavras, onde os elementos da lista respeitam
   ///a condição representada pela função passada como parâmetro. Caso a função
   ///passada seja [null], retorna todos os elementos.
-  List<DSIWordPair> getByFilter(bool test(DSIWordPair element)) {
-    print("getByFilter: $test");
-    List<DSIWordPair> result = _wordPairs;
+  Future<Iterable<DSIWordPair>> getByFilter(
+      bool test(DSIWordPair element)) async {
+    Iterable<DSIWordPair> result = await getAll();
     if (test != null) {
-      result = _wordPairs.where(test).toList();
+      result = result.where(test).toList();
     }
     return List.unmodifiable(result);
   }
 
   ///Atualiza ou insere o par de palavras.
   ///A atualização ocorre caso o par de palavras possua um [id] setado.
-  void save(DSIWordPair wordPair) {
+  Future save(DSIWordPair wordPair) async {
     if (wordPair.id == null) {
-      wordPair.id = _nextWordPairId++;
+      return _wordPairs.add(wordPair.toJson());
     } else {
-      DSIWordPair oldWordPair = getById(wordPair.id);
-      delete(oldWordPair);
+      return _wordPairs.doc(wordPair.id).update(wordPair.toJson());
     }
-    _wordPairs.add(wordPair);
-    _wordPairs.sort();
   }
 
   ///Remove o par de palavras.
-  void delete(DSIWordPair wordPair) {
-    _wordPairs.remove(wordPair);
-    _wordPairs.sort();
+  Future delete(DSIWordPair wordPair) {
+    return _wordPairs.doc(wordPair.id).delete();
   }
 }

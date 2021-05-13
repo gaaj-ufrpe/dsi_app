@@ -1,6 +1,61 @@
+import 'dart:async';
+
 import 'package:dsi_app/controller/word_pair_controller.dart';
 import 'package:dsi_app/model/word_pair_model.dart';
 import 'package:flutter/material.dart';
+
+///Exibe uma mensagem no SnackBar.
+void _showMessage(BuildContext context, String text) {
+  final snackBar = SnackBar(
+    content: Text(text),
+    action: SnackBarAction(
+      label: 'OK',
+      onPressed: () {
+        // Some code to undo the change.
+      },
+    ),
+  );
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
+
+///Constroi o componente que apresenta o erro no carregamento do Firebase.
+Widget _buildError(context) {
+  return Directionality(
+    textDirection: TextDirection.ltr,
+    child: Center(
+      child: Text(
+        'Erro ao carregar os dados do App.\n'
+        'Tente novamente mais tarde.',
+        style: TextStyle(
+          color: Colors.red,
+          fontSize: 16.0,
+        ),
+      ),
+    ),
+  );
+}
+
+///Constrói o componente de load.
+Widget _buildLoading(context) {
+  return Directionality(
+    textDirection: TextDirection.ltr,
+    child: Center(
+      child: Row(
+        children: <Widget>[
+          CircularProgressIndicator(),
+          Text(
+            'carregando...',
+            style: TextStyle(
+              color: Colors.green,
+              fontSize: 16.0,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
 ///Página inicial que apresenta o [BottomNavigationBar], onde cada
 ///[BottomNavigationBarItem] é uma página do tipo [WordPairListPage].
@@ -105,8 +160,8 @@ class _WordPairListPageState extends State<WordPairListPage> {
   ///retorna todas as palavras, as palavras curtidas ou as palavras não curtidas.
   ///Veja:
   /// https://dart.dev/guides/language/language-tour#getters-and-setters
-  Iterable<DSIWordPair> get items {
-    List<DSIWordPair> result;
+  Future<Iterable<DSIWordPair>> get items {
+    FutureOr<Iterable<DSIWordPair>> result;
     if (widget._filter == null) {
       result = _controller.getAll();
     } else {
@@ -117,7 +172,7 @@ class _WordPairListPageState extends State<WordPairListPage> {
   }
 
   ///Altera o estado de curtida da palavra.
-  _toggleFavourite(DSIWordPair wordPair) {
+  _toggleFavourite(BuildContext context, DSIWordPair wordPair) {
     bool like = wordPair.favourite;
     if (widget._filter != null) {
       wordPair.favourite = null;
@@ -128,8 +183,12 @@ class _WordPairListPageState extends State<WordPairListPage> {
     } else {
       wordPair.favourite = null;
     }
-    _controller.save(wordPair);
-    setState(() {});
+    _controller.save(wordPair).then((value) {
+      _showMessage(context, 'Operação realizada com sucesso.');
+      setState(() {});
+    }).onError((error, stackTrace) {
+      _showMessage(context, 'Operação realizada com sucesso.');
+    });
   }
 
   ///Constroi a listagem de itens.
@@ -137,16 +196,31 @@ class _WordPairListPageState extends State<WordPairListPage> {
   ///inclua um separador ([Divider]) na listagem.
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: items.length * 2,
-        itemBuilder: (BuildContext _context, int i) {
-          if (i.isOdd) {
-            return Divider();
-          }
-          final int index = i ~/ 2;
-          return _buildRow(context, index + 1, items.elementAt(index));
-        });
+    return FutureBuilder(
+      future: items,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return _buildError(context);
+        }
+
+        if (snapshot.connectionState == ConnectionState.done) {
+          var wordPairs = snapshot.data;
+          return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: wordPairs.length * 2,
+              itemBuilder: (BuildContext _context, int i) {
+                if (i.isOdd) {
+                  return Divider();
+                }
+                final int index = i ~/ 2;
+                return _buildRow(
+                    context, index + 1, wordPairs.elementAt(index));
+              });
+        }
+
+        return _buildLoading(context);
+      },
+    );
   }
 
   ///Constroi uma linha da listagem a partir do par de palavras e do índice.
@@ -154,7 +228,7 @@ class _WordPairListPageState extends State<WordPairListPage> {
     return ListTile(
       title: Text('$index. ${wordPair}'),
       trailing: TextButton(
-        onPressed: () => _toggleFavourite(wordPair),
+        onPressed: () => _toggleFavourite(context, wordPair),
         child: _icons[wordPair.favourite],
       ),
       onTap: () => _updateWordPair(context, wordPair),
