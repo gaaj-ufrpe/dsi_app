@@ -122,8 +122,9 @@ class _DSIPageState extends State<DSIPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
+        tooltip: 'Increment',
         child: Icon(Icons.add),
-      ), // This trailing comma makes asdasdasd auto-formatting nicer for build methods.
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
@@ -140,7 +141,6 @@ class DSIMainBodyWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Text(_countText),
-        Text('testes teste !'),
         if (_warningText.isNotEmpty)
           Text(
             _warningText,
